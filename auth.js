@@ -1,6 +1,6 @@
 (() => {
   'use strict';
-  const V=window.SohbetixV34;
+  const V=window.SohbetixV35||window.SohbetixV34;
   const gateTime=Number(sessionStorage.getItem('sohbetix-auth-entry-v30')||sessionStorage.getItem('sohbetix-auth-entry-v28')||0);
   if(!gateTime || Date.now()-gateTime>10*60*1000){ location.replace('open-chat.html'); return; }
   const $=id=>document.getElementById(id);
@@ -77,7 +77,7 @@
     if(pass!==pass2){st.textContent='Şifreler aynı değil.';return;}
     const list=V.users();
     if(list.some(x=>norm(x.email)===email)){st.textContent='Bu e-posta zaten kayıtlı.';return;}
-    const user={id:V.uuid(),email,emailVerified:true,emailVerifiedAt:Date.now(),passwordHash:await hash(pass),createdAt:Date.now(),coins:5000,vipUntil:0};
+    const user={id:V.uuid(),email,emailVerified:true,emailVerifiedAt:Date.now(),passwordHash:await hash(pass),createdAt:Date.now(),coins:150,vipUntil:0};
     list.push(user);V.saveUsers(list);setAuth(user);
     st.textContent='✓ Hesap oluşturuldu. Sohbet rumuzunu Yeni profil oluştur bölümünden seçebilirsin.';st.classList.add('ok');
     setTimeout(done,320);
@@ -89,7 +89,7 @@
     let user=V.users().find(x=>norm(x.email)===email);
     if(!user||user.passwordHash!==await hash(pass)){st.textContent='E-posta veya şifre hatalı.';return;}
     if(user.emailVerified===false){st.textContent='Bu hesabın e-posta doğrulaması tamamlanmamış.';return;}
-    if(!Number.isFinite(Number(user.coins))) user=V.updateUser(user.id,{coins:5000});
+    if(!Number.isFinite(Number(user.coins))) user=V.updateUser(user.id,{coins:150});
     setAuth(user);st.textContent='✓ Giriş başarılı.';st.classList.add('ok');setTimeout(done,240);
   });
 })();

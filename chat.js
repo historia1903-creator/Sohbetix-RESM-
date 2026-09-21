@@ -1,7 +1,7 @@
 (() => {
   'use strict';
 
-  const V=window.SohbetixV34;
+  const V=window.SohbetixV35||window.SohbetixV34;
   let STORAGE_MESSAGES='';
   let STORAGE_PRESENCE='';
   const SESSION_NICK = 'sohbetix-v17-current-nick';
@@ -14,6 +14,11 @@
   const SESSION_JOIN_FLAG = 'sohbetix-v30-join-announced';
   const CONFIG_KEY='sohbetix-v18-chat-config';
   const DEFAULT_CONFIG={title:'Sohbetix',language:'tr',disabled:false,imageShare:false,privateMode:'entered',catalogVisible:true,description:'',category:'Arkadaşlık',slug:'sohbetix'};
+  let activePublicRoomIdV35=sessionStorage.getItem('sohbetix-v35-active-room')||'main';
+  function roomConfigV35(){return V?.roomById?.(activePublicRoomIdV35)||{id:'main',title:'Ana sayfa',visible:true,joinLeave:true,readAccess:'all',enterAccess:'entered',sendAccess:'entered',linkAccess:'entered',maxLength:512,badWords:false};}
+  function roleBadgeV35(nick){const r=V?.roleForNick?.(nick)||'user';return r==='admin'?' <span class="role-badge-v35 admin" title="Yönetici">👑</span>':r==='moderator'?' <span class="role-badge-v35 moderator" title="Moderatör">👤</span>':'';}
+  function canUseRoomV35(room){if(!room)return true;if(room.enterAccess==='registered'&&!isRegistered)return false;return true;}
+
   function readConfig(){
     let base={...DEFAULT_CONFIG};
     try{base={...base,...JSON.parse(localStorage.getItem(CONFIG_KEY)||'{}')}}catch{}
@@ -853,7 +858,7 @@
   function addMessage(type, data = {}) {
     let list = readMessages();
     if (data.nick && data.registered === undefined && data.nick === currentNick) data.registered = isRegistered;
-    list.push({id:`m-${Date.now()}-${Math.random().toString(36).slice(2)}`, type, at:Date.now(), time:nowTime(), ...data});
+    list.push({id:`m-${Date.now()}-${Math.random().toString(36).slice(2)}`, type, roomId:activePrivateNick?'private':activePublicRoomIdV35, at:Date.now(), time:nowTime(), ...data});
 
     // 10.000 normal sohbet mesajına ulaşıldığında eski geçmişi tamamen temizle.
     // Katılma/ayrılma ve bot bildirimleri 10.000 sayacına dahil edilmez.
@@ -881,7 +886,7 @@
       els.messages.innerHTML = '<div class="room-empty-v15">Sohbet henüz boş. İlk katılan sen olabilirsin.</div>';
       return;
     }
-    els.messages.innerHTML = list.filter(msg=>!msg.nick || !isBlockedWithV30(msg.nick)).map(msg => {
+    els.messages.innerHTML = list.filter(msg=>(String(msg.roomId||'main')===String(activePublicRoomIdV35))).filter(msg=>!msg.nick || !isBlockedWithV30(msg.nick)).map(msg => {
       const registered = targetRegistrationByNick(msg.nick, msg.registered);
       if (msg.type === 'join') {
         const vv=userVisualV29(msg.nick||'');
@@ -958,7 +963,7 @@
     const filtered = users.filter(u => !isBlockedWithV30(u.nick)).filter(u => !q || String(u.nick).toLocaleLowerCase('tr-TR').includes(q));
     const botMatches = !q || BOT_NICK.toLocaleLowerCase('tr-TR').includes(q);
     const botRow = botMatches ? `<li class="room-bot-user-v17"><span class="room-mini-avatar-v15 room-bot-avatar-v17">S</span><b>${escapeHtml(BOT_NICK)}</b></li>` : '';
-    els.userList.innerHTML = botRow + filtered.map(u => {const vv=userVisualV29(u.nick);return `<li class="user-target-v20 ${vv.vip?'vip-user-v28':''}" data-user-nick="${escapeHtml(u.nick||'')}" data-user-registered="${normalizeRegisteredFlag(u.registered)?'1':'0'}">${avatarHtmlV29(u.nick,true)}${presenceStatusHtmlV29(u.status)}<b style="color:${vv.nickColor};font-weight:${vv.boldNick?'900':'700'};text-decoration:${vv.boldNick?'underline':'none'}">${escapeHtml(u.nick)}</b>${vv.vip?'<span class="vip-crown-v28">VIP</span>':''}</li>`;}).join('');
+    els.userList.innerHTML = botRow + filtered.map(u => {const vv=userVisualV29(u.nick);return `<li class="user-target-v20 ${vv.vip?'vip-user-v28':''}" data-user-nick="${escapeHtml(u.nick||'')}" data-user-registered="${normalizeRegisteredFlag(u.registered)?'1':'0'}">${avatarHtmlV29(u.nick,true)}${presenceStatusHtmlV29(u.status)}<b style="color:${vv.nickColor};font-weight:${vv.boldNick?'900':'700'};text-decoration:${vv.boldNick?'underline':'none'}">${escapeHtml(u.nick)}</b>${roleBadgeV35(u.nick)}${vv.vip?'<span class="vip-crown-v28">VIP</span>':''}</li>`;}).join('');
   }
 
   function heartbeatPresence() {
@@ -1083,6 +1088,8 @@
     }
 
     if(!nick) return;
+    if(V?.isChatBanned?.(nick)){toastV20('Bu kayıtlı rumuz bu sohbetten kalıcı olarak silinmiş.');return;}
+    if(!canUseRoomV35(roomConfigV35())){toastV20('Bu odaya yalnızca kayıtlı kullanıcılar girebilir.');return;}
     const previousNick=cleanNick(currentNick);
     if(previousNick && previousNick.toLocaleLowerCase('tr-TR')!==cleanNick(nick).toLocaleLowerCase('tr-TR')){
       clearInterval(heartbeat);
@@ -1308,13 +1315,22 @@
     e.preventDefault();
     const text = els.messageInput.value.trim();
     if (!currentNick || !text) return;
+    const rcV35=roomConfigV35();
+    if(!activePrivateNick){
+      if(rcV35.sendAccess==='registered'&&!isRegistered){toastV20('Bu odada yalnızca kayıtlı kullanıcılar mesaj gönderebilir.');return;}
+      if(rcV35.badWords && V?.containsBlockedTerms?.(text)){toastV20('Bu odada uygunsuz kelimeler engelleniyor. Mesaj gönderilmedi.');return;}
+    }
     if(containsLinkV32(text)){
-      if(!activePrivateNick){toastV20('Ana sayfada bağlantı paylaşmak yasaktır.');return;}
+      if(!activePrivateNick){
+        if(rcV35.linkAccess==='none'||(rcV35.linkAccess==='registered'&&!isRegistered)){toastV20('Bu odada bağlantı paylaşma iznin yok.');return;}
+        toastV20('Ana sayfada bağlantı paylaşmak yasaktır.');return;
+      }
       if(!isVipV25()){toastV20('Gizli sohbette bağlantı paylaşımı yalnızca VIP kullanıcılar içindir.');return;}
     }
     if (!checkFloodBeforeSend(text)) return;
+    const maxLenV35=Math.max(32,Math.min(5000,Number(rcV35.maxLength||512)));
     if(activePrivateNick) addPrivateMessageV29(activePrivateNick,{type:'chat',text:text.slice(0,512)});
-    else addMessage('chat', {nick:currentNick, text:text.slice(0,512)});
+    else addMessage('chat', {nick:currentNick, text:text.slice(0,maxLenV35)});
     els.messageInput.value = '';
     els.messageInput.focus();
     if(els.mentionSuggest) els.mentionSuggest.hidden=true;
@@ -1404,6 +1420,21 @@
   });
   initEmojiPanelV23();
   renderPrivateTabsV29();
+
+
+  // V35 public room tabs
+  function renderPublicRoomsV35(){
+    const host=document.getElementById('publicRoomTabsV35'); if(!host||!V?.readRooms)return;
+    const list=V.readRooms().filter(r=>r.id!=='main'&&r.visible!==false&&!r.hidden);
+    host.innerHTML=list.map(r=>`<button type="button" class="public-room-tab-v35 ${String(r.id)===String(activePublicRoomIdV35)?'active':''}" data-public-room-v35="${escapeHtml(r.id)}">${escapeHtml(r.title)}</button>`).join('');
+    const main=document.getElementById('mainChatTabV28');if(main)main.classList.toggle('active',activePublicRoomIdV35==='main'&&!activePrivateNick);
+    const rc=roomConfigV35(); if(els.messageInput)els.messageInput.maxLength=Math.max(32,Math.min(5000,Number(rc.maxLength||512)));
+  }
+  function switchPublicRoomV35(id){const r=V?.roomById?.(id);if(!r||!canUseRoomV35(r)){toastV20('Bu odaya giriş iznin yok.');return;}activePrivateNick='';activePublicRoomIdV35=String(r.id);sessionStorage.setItem('sohbetix-v35-active-room',activePublicRoomIdV35);renderPrivateTabsV29();renderPublicRoomsV35();renderMessages(true);if(r.welcomeEnabled&&r.welcome)toastV20(String(r.welcome).slice(0,180));}
+  document.getElementById('publicRoomTabsV35')?.addEventListener('click',e=>{const b=e.target.closest('[data-public-room-v35]');if(b)switchPublicRoomV35(b.dataset.publicRoomV35);});
+  document.getElementById('mainChatTabV28')?.addEventListener('click',()=>switchPublicRoomV35('main'));
+  window.addEventListener('storage',e=>{if(e.key&&e.key.startsWith('sohbetix-v35-rooms:')){renderPublicRoomsV35();renderMessages();}if(e.key&&e.key.startsWith('sohbetix-v35-roles:'))renderPresence();});
+  renderPublicRoomsV35();
   renderMessages();
   renderPresence();
   if (currentNick) {

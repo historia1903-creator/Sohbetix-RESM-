@@ -5,7 +5,7 @@
 <meta charset="utf-8"/>
 <meta content="width=device-width,initial-scale=1" name="viewport"/>
 <title>Sohbetix Kontrol Paneli</title>
-<link href="styles.css?v=V34-STATIC-FIX" rel="stylesheet"/>
+<link href="styles.css?v=V35-STATIC-FIX" rel="stylesheet"/>
 <meta content="#17102F" name="theme-color"/>
 <link rel="icon" type="image/jpeg" href="sohbetix-logo.jpg"/>
 </head>
@@ -110,7 +110,7 @@ document.getElementById('registerSubmit').addEventListener('click',async()=>{
   if(pass!==pass2){alert('Şifreler aynı değil.');return;}
   const users=readControlUsers();
   if(users.some(u=>normalizeControl(u.email)===email)){alert('Bu e-posta zaten kayıtlı.');return;}
-  const user={id:(crypto.randomUUID?crypto.randomUUID():'cp-'+Date.now()),email,emailVerified:true,emailVerifiedAt:Date.now(),passwordHash:await controlHash(pass),createdAt:Date.now(),coins:5000};
+  const user={id:(crypto.randomUUID?crypto.randomUUID():'cp-'+Date.now()),email,emailVerified:true,emailVerifiedAt:Date.now(),passwordHash:await controlHash(pass),createdAt:Date.now(),coins:150};
   users.push(user); writeControlUsers(users); saveControlSession(user);
   location.href='chat-platform.html';
 });
@@ -122,10 +122,10 @@ document.getElementById('loginSubmit').addEventListener('click',async()=>{
   const users=readControlUsers();
   let user=users.find(u=>normalizeControl(u.email)===login);
   if(!user||user.passwordHash!==await controlHash(pass)){alert('E-posta veya şifre hatalı.');return;}
-  if(!Number.isFinite(Number(user.coins))){user={...user,coins:5000};const i=users.findIndex(x=>String(x.id)===String(user.id));users[i]=user;writeControlUsers(users);}
+  if(!Number.isFinite(Number(user.coins))){user={...user,coins:150};const i=users.findIndex(x=>String(x.id)===String(user.id));users[i]=user;writeControlUsers(users);}
   saveControlSession(user);
   location.href='chat-platform.html';
 });
 </script>
-<script src="app.js?v=V34-STATIC-FIX"></script><script src="v34-core.js?v=V34-STATIC-FIX"></script><script src="presence-bridge.js?v=V34-STATIC-FIX"></script></body>
+<script src="app.js?v=V35-STATIC-FIX"></script><script src="v35-core.js?v=V35-STATIC-FIX"></script><script src="presence-bridge.js?v=V35-STATIC-FIX"></script></body>
 </html>

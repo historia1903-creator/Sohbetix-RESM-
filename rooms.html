@@ -1,62 +1,28 @@
-<!DOCTYPE html>
-
-<html lang="tr"><head><meta charset="utf-8"/><meta content="width=device-width,initial-scale=1" name="viewport"/><title>Sohbet odaları - Sohbetix</title><link href="styles.css?v=V34-STATIC-FIX" rel="stylesheet"/><meta content="#17102F" name="theme-color"/>
-<link rel="icon" type="image/jpeg" href="sohbetix-logo.jpg"/>
-</head>
-<body class="admin-page">
-<header class="admin-top">
-<div class="admin-wrap admin-nav">
-<a class="brand brand-logo-v21" href="index.html" aria-label="Sohbetix"><img src="sohbetix-logo.jpg" alt="Sohbetix"/></a>
-<a class="admin-nav-link active" href="dashboard.html">SOHBET KONTROL PANELİ</a>
-<span class="admin-nav-link disabled">JETONLAR — 🪙 0</span>
-<div class="admin-user">👤 Sohbetix Kullanıcısı ▾</div>
-</div>
-</header>
-<main class="admin-main"><div class="admin-wrap">
-<div class="admin-breadcrumb">
-<a class="root" href="dashboard.html">Kontrol paneli</a>
-<span class="sep">→</span>
-<strong>Sohbetix</strong>
-<span class="sep">→</span>
-<span>Ayarlar</span>
-<a class="admin-open-chat" href="open-chat.html" target="_blank">↗ Sohbeti aç</a>
-</div>
-<div class="admin-tabs">
-<a class="admin-tab" href="settings.html">Ana ayarlar</a>
-<a class="admin-tab active" href="rooms.html">Odalar</a>
-<a class="admin-tab" href="domain.html">Sohbet adresi (alan adı)</a>
-</div>
-<div class="rooms-layout">
-<aside class="room-list">
-<div class="room-item">Ana sayfa ✥</div>
-<a class="new-room" href="#">✚ Yeni sekme</a>
-</aside>
-<section class="room-settings">
-<h1 class="smiley-title" style="margin-top:0">Oda ayarları</h1>
-<div class="admin-row"><label>Başlık:</label><input class="wide" type="text" value="Ana sayfa"/></div>
-<label class="admin-check"><input checked="" type="checkbox"/> Odayı varsayılan olarak sohbet sekmelerinde göster</label>
-<label class="admin-check"><input checked="" type="checkbox"/> Kullanıcı giriş/çıkış mesajlarını göster</label>
-<label class="admin-check"><input type="checkbox"/> Gizli oda</label>
-<label class="admin-check"><input type="checkbox"/> Odanın kapatılmasına izin ver</label>
-<label class="admin-check"><input type="checkbox"/> Karşılama mesajı <span class="pro-badge" style="background:#58b8d8">Markdown</span></label>
-<div class="admin-row"><textarea class="wide" placeholder="Süper sohbet odamıza hoş geldiniz!"></textarea></div>
+<!DOCTYPE html><html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Sohbet odaları - Sohbetix</title><link href="styles.css?v=V35-STATIC-FIX" rel="stylesheet"><meta content="#17102F" name="theme-color"><link rel="icon" type="image/jpeg" href="sohbetix-logo.jpg"></head>
+<body class="admin-page v35-rooms-page">
+<header class="admin-top"><div class="admin-wrap admin-nav"><a class="brand brand-logo-v21" href="index.html" aria-label="Sohbetix"><img src="sohbetix-logo.jpg" alt="Sohbetix"></a><a class="admin-nav-link active" href="dashboard.html">SOHBET KONTROL PANELİ</a><div class="admin-user" id="ownerIdentityV35">👤 Sohbetix Kullanıcısı</div></div></header>
+<main class="admin-main"><div class="admin-wrap"><div class="admin-breadcrumb"><a class="root" href="dashboard.html">Kontrol paneli</a><span class="sep">→</span><strong>Sohbetix</strong><span class="sep">→</span><span>Odalar</span><a class="admin-open-chat" id="roomsOpenChatV35" href="open-chat.html" target="_blank">↗ Sohbeti aç</a></div>
+<div class="admin-tabs"><a class="admin-tab" href="settings.html">Ana ayarlar</a><a class="admin-tab active" href="rooms.html">Odalar</a><a class="admin-tab" href="domain.html">Sohbet adresi (alan adı)</a></div>
+<div class="rooms-layout v35-rooms-layout"><aside class="room-list v35-room-list"><div id="roomListV35"></div><button class="new-room" id="newRoomV35" type="button">✚ Yeni sekme</button><small id="roomCountV35">Ana sayfa + en fazla 2 yeni sekme</small></aside>
+<section class="room-settings"><h1 class="smiley-title" style="margin-top:0">Oda ayarları</h1><input id="roomIdV35" type="hidden">
+<div class="admin-row"><label>Başlık:</label><input class="wide" id="roomTitleV35" maxlength="32" type="text"></div>
+<label class="admin-check"><input id="roomDefaultV35" type="checkbox"> Odayı varsayılan olarak sohbet sekmelerinde göster</label>
+<label class="admin-check"><input id="roomJoinLeaveV35" type="checkbox"> Kullanıcı giriş/çıkış mesajlarını göster</label>
+<label class="admin-check"><input id="roomHiddenV35" type="checkbox"> Gizli oda</label>
+<label class="admin-check"><input id="roomAllowCloseV35" type="checkbox"> Odanın kapatılmasına izin ver</label>
+<label class="admin-check"><input id="roomWelcomeEnabledV35" type="checkbox"> Karşılama mesajı <span class="pro-badge" style="background:#58b8d8">Markdown</span></label>
+<div class="admin-row"><textarea class="wide" id="roomWelcomeV35" maxlength="500" placeholder="Süper sohbet odamıza hoş geldiniz!"></textarea></div>
 <h2 class="admin-section-title">Spam koruması ve erişim kontrolü</h2>
-<div class="admin-row"><label>İzin verilen minimum kullanıcı yaşı:</label><input class="wide" type="number"/></div>
-<div class="admin-row"><label>Mesajları okuyabilecekler:</label><select class="wide"><option>Tüm kullanıcılar</option><option>Odaya girenler</option></select></div>
-<div class="admin-row"><label>Odaya girebilecekler:</label><select class="wide"><option>Sohbete girenler</option><option>Kayıtlı kullanıcılar</option></select></div>
-<div class="admin-row"><label>Mesaj gönderebilecekler:</label><select class="wide"><option>Odaya girenler</option><option>Kayıtlı kullanıcılar</option></select></div>
-<div class="admin-row"><label>Bağlantı gönderebilecekler:</label><select class="wide"><option>Odaya girenler</option><option>Kayıtlı kullanıcılar</option></select></div>
-<div class="admin-row"><label>Maksimum mesaj uzunluğu:</label><input class="wide" type="number" value="512"/></div>
-<label class="admin-check"><input checked="" disabled="" type="checkbox"/> Flood kontrolü</label>
-<label class="admin-check"><input type="checkbox"/> Kötü kelimeleri engelleme <span class="pro-badge">PRO</span></label>
-<button class="admin-save">Değişiklikleri kaydet</button>
-</section>
-</div>
-</div></main>
-<footer class="admin-footer">
-<div class="admin-wrap footer-inner">
-<div>© 2026 Sohbetix</div>
-<select class="lang-switch"><option value="tr">Türkçe</option><option value="en">English</option></select>
-</div>
-</footer>
-<script src="app.js?v=V34-STATIC-FIX"></script><script src="v34-core.js?v=V34-STATIC-FIX"></script><script src="presence-bridge.js?v=V34-STATIC-FIX"></script></body></html>
+<div class="admin-row"><label>İzin verilen minimum kullanıcı yaşı:</label><input class="wide" id="roomMinAgeV35" min="0" max="99" type="number"></div>
+<div class="admin-row"><label>Mesajları okuyabilecekler:</label><select class="wide" id="roomReadAccessV35"><option value="all">Tüm kullanıcılar</option><option value="entered">Odaya girenler</option><option value="registered">Kayıtlı kullanıcılar</option></select></div>
+<div class="admin-row"><label>Odaya girebilecekler:</label><select class="wide" id="roomEnterAccessV35"><option value="entered">Sohbete girenler</option><option value="registered">Kayıtlı kullanıcılar</option></select></div>
+<div class="admin-row"><label>Mesaj gönderebilecekler:</label><select class="wide" id="roomSendAccessV35"><option value="entered">Odaya girenler</option><option value="registered">Kayıtlı kullanıcılar</option></select></div>
+<div class="admin-row"><label>Bağlantı gönderebilecekler:</label><select class="wide" id="roomLinkAccessV35"><option value="entered">Odaya girenler</option><option value="registered">Kayıtlı kullanıcılar</option><option value="none">Hiç kimse</option></select></div>
+<div class="admin-row"><label>Maksimum mesaj uzunluğu:</label><input class="wide" id="roomMaxLengthV35" min="32" max="5000" type="number" value="512"></div>
+<label class="admin-check"><input checked disabled type="checkbox"> Flood kontrolü</label>
+<label class="admin-check"><input id="roomBadWordsV35" type="checkbox"> Kötü kelimeleri ve +18 ifadeleri engelle</label>
+<div class="small-note" id="roomSavedV35" hidden>✓ Oda ayarları kaydedildi ve sohbete uygulandı.</div>
+<div class="v35-room-actions"><button class="admin-save" id="saveRoomV35" type="button">Değişiklikleri kaydet</button><button class="delete-users" id="deleteRoomV35" type="button">Odayı sil</button></div>
+</section></div></div></main>
+<footer class="admin-footer"><div class="admin-wrap footer-inner"><div>© 2026 Sohbetix</div><select class="lang-switch"><option value="tr">Türkçe</option><option value="en">English</option></select></div></footer>
+<script src="v35-core.js?v=V35-STATIC-FIX"></script><script src="owner-guard-v35.js?v=V35-STATIC-FIX"></script><script src="app.js?v=V35-STATIC-FIX"></script><script src="rooms-v35.js?v=V35-STATIC-FIX"></script><script src="presence-bridge.js?v=V35-STATIC-FIX"></script></body></html>
