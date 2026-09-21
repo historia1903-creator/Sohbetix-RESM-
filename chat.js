@@ -1,0 +1,1464 @@
+(() => {
+  'use strict';
+
+  const V=window.SohbetixV34;
+  let STORAGE_MESSAGES='';
+  let STORAGE_PRESENCE='';
+  const SESSION_NICK = 'sohbetix-v17-current-nick';
+  const MAX_MESSAGES = 10000;
+  const BOT_NICK = 'Sohbetix Bot';
+  const BOT_PURGE_TEXT = 'Eski 10.000 tane mesaj kalıcı olarak silindi!';
+  const PRESENCE_TTL = 240000;
+  const HEARTBEAT_MS = 15000;
+  const STORAGE_LEAVE_SEEN = 'sohbetix-v30-leave-seen';
+  const SESSION_JOIN_FLAG = 'sohbetix-v30-join-announced';
+  const CONFIG_KEY='sohbetix-v18-chat-config';
+  const DEFAULT_CONFIG={title:'Sohbetix',language:'tr',disabled:false,imageShare:false,privateMode:'entered',catalogVisible:true,description:'',category:'Arkadaşlık',slug:'sohbetix'};
+  function readConfig(){
+    let base={...DEFAULT_CONFIG};
+    try{base={...base,...JSON.parse(localStorage.getItem(CONFIG_KEY)||'{}')}}catch{}
+    const params=new URLSearchParams(location.search);
+    const room=String(params.get('room')||'').trim().toLocaleLowerCase('tr-TR');
+    if(room){
+      try{
+        const catalog=JSON.parse(localStorage.getItem('sohbetix-v28-chat-catalog')||localStorage.getItem('sohbetix-v27-chat-catalog')||'[]');
+        const found=Array.isArray(catalog)?catalog.find(x=>String(x?.slug||'').toLocaleLowerCase('tr-TR')===room):null;
+        if(found){
+          base={
+            ...base,
+            title:String(found.title||base.title),
+            language:found.language==='en'?'en':'tr',
+            description:String(found.description||''),
+            category:String(found.category||base.category),
+            slug:String(found.slug||room)
+          };
+        }else{
+          base.slug=room;
+        }
+      }catch{base.slug=room;}
+    }
+    return base;
+  }
+  const cfg=readConfig();
+  STORAGE_MESSAGES='sohbetix-v30-room-messages:'+String(cfg.slug||'sohbetix');
+  if(!localStorage.getItem(STORAGE_MESSAGES)){const old=localStorage.getItem('sohbetix-v28-room-messages:'+String(cfg.slug||'sohbetix'));if(old)localStorage.setItem(STORAGE_MESSAGES,old);}
+  STORAGE_PRESENCE='sohbetix-v30-room-presence:'+String(cfg.slug||'sohbetix');
+  const isRegistered=localStorage.getItem('sohbetix-auth-type')==='registered' && !!String(localStorage.getItem('sohbetix-auth-id')||'').trim() && !!String(localStorage.getItem('sohbetix-auth-email')||'').trim();
+
+  const $ = (id) => document.getElementById(id);
+  const els = {
+    onlineCount: $('onlineCount'), userList: $('roomUserList'), search: $('nickSearch'), messages: $('roomMessages'),
+    guestFooter: $('guestFooter'), messageForm: $('messageForm'), messageInput: $('messageInput'),
+    openJoin: $('openJoinModal'), overlay: $('joinOverlay'), closeJoin: $('closeJoinModal'), guestNick: $('guestNick'),
+    nickCounter: $('nickCounter'), joinBtn: $('joinChatBtn'), roomAccount: $('roomAccount'), roomAccountNick: $('roomAccountNick'),
+    roomAccountBtn: $('roomAccountBtn'), roomAccountMenu: $('roomAccountMenu'), leaveBtn: $('leaveRoomBtn'), preJoinBlessing: $('preJoinBlessing'), disabledNotice:$('chatDisabledNotice'), latestMessagesBtn:$('latestMessagesBtn'), profileSaveHint:$('profileSaveHint'), accountAuthBtn:$('accountAuthBtn'),
+    smileyBtn:$('smileyBtn'), emojiPanel:$('emojiPanel'), emojiGrid:$('emojiGrid'), mentionSuggest:$('mentionSuggest'), floodWarning:$('floodWarning'), floodCountdown:$('floodCountdown'), floodVipBtn:$('floodVipBtn'),
+    registeredProfilePanel:$('registeredProfilePanel'), guestJoinPanel:$('guestJoinPanel'), registeredAccountEmail:$('registeredAccountEmail'),
+    registeredLogoutBtn:$('registeredLogoutBtn'), savedProfilesV25:$('savedProfilesV25'), newProfileBtnV25:$('newProfileBtnV25'),
+    profileEditorV25:$('profileEditorV25'), profileEditorLabelV25:$('profileEditorLabelV25'), profileNickV25:$('profileNickV25'),
+    profileNickCounterV25:$('profileNickCounterV25'), profileLimitV25:$('profileLimitV25'), profileVipBtnV25:$('profileVipBtnV25'),
+    profileRefreshBtn:$('profileRefreshBtn'), chatImageInputV29:$('chatImageInputV28'), chatImageButtonV29:$('chatImageButtonV28'),
+    mainChatTabV29:$('mainChatTabV28'), privateTabsV29:$('privateTabsV28'),
+    roomAccountStatusIcon:$('roomAccountStatusIcon'),
+    messageSelectionMenuV29:$('messageSelectionMenuV29'),
+    deleteSelectedMessagesV29:$('deleteSelectedMessagesV29'),
+    cancelSelectedMessagesV29:$('cancelSelectedMessagesV29'),
+    voiceRecordButtonV34:$('voiceRecordButtonV34'), voiceRecordTimeV34:$('voiceRecordTimeV34')
+  };
+
+  const CLIENT_ID_KEY='sohbetix-v30-client-id:'+String(cfg.slug||'sohbetix');
+  let clientId=sessionStorage.getItem(CLIENT_ID_KEY);
+  if(!clientId){
+    clientId=(crypto?.randomUUID?.() || `client-${Date.now()}-${Math.random().toString(36).slice(2)}`);
+    sessionStorage.setItem(CLIENT_ID_KEY,clientId);
+  }
+  let currentNick = sessionStorage.getItem(SESSION_NICK) || '';
+  let heartbeat = null;
+  const PRIVATE_STORAGE_PREFIX = 'sohbetix-v30-private:' + String(cfg.slug || 'sohbetix') + ':';
+  const PRIVATE_META_PREFIX = 'sohbetix-v30-private-meta:' + String(cfg.slug || 'sohbetix') + ':';
+  let activePrivateNick = '';
+  const openedPrivateNicks = new Set();
+  const PRIVATE_NOTIFY_PREFIX='sohbetix-v34-private-notify:' + String(cfg.slug||'sohbetix') + ':';
+  const PRIVATE_CHANNEL_NAME='sohbetix-v34-private:' + String(cfg.slug||'sohbetix');
+  let privateChannelV32=null;
+  try{ if('BroadcastChannel' in window) privateChannelV32=new BroadcastChannel(PRIVATE_CHANNEL_NAME); }catch{}
+
+  function safeParse(raw, fallback) {
+    try { return raw ? JSON.parse(raw) : fallback; } catch { return fallback; }
+  }
+  function readMessages() { return safeParse(localStorage.getItem(STORAGE_MESSAGES), []); }
+  function writeMessages(list) { localStorage.setItem(STORAGE_MESSAGES, JSON.stringify(list)); }
+  function readPresence() { return safeParse(localStorage.getItem(STORAGE_PRESENCE), {}); }
+  function writePresence(obj) { localStorage.setItem(STORAGE_PRESENCE, JSON.stringify(obj)); }
+  function nowTime() { return new Date().toLocaleTimeString(cfg.language==='en'?'en-GB':'tr-TR', {hour:'2-digit', minute:'2-digit'}); }
+  function escapeHtml(value) {
+    return String(value).replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch]));
+  }
+  function cleanNick(value) {
+    return String(value || '').replace(/[\r\n\t]/g, ' ').replace(/\s{2,}/g, ' ').trim().slice(0, 20);
+  }
+
+  const AUTH_ID = String(localStorage.getItem('sohbetix-auth-id') || '');
+  const AUTH_EMAIL = String(localStorage.getItem('sohbetix-auth-email') || '');
+  const STATUS_STORAGE_PREFIX = 'sohbetix-v30-presence-status:' + String(cfg.slug||'sohbetix') + ':';
+  let currentStatus = 'online';
+  const selectedMessageIdsV29 = new Set();
+  const PROFILE_STORE_KEY = 'sohbetix-v30-chat-profiles:' + (AUTH_ID || AUTH_EMAIL || 'guest');
+  let selectedProfileId = '';
+  let profileMode = 'existing'; // existing | new | edit
+
+  function readChatProfilesV25(){
+    if(!isRegistered) return [];
+    return V.readProfiles(AUTH_ID || AUTH_EMAIL);
+  }
+
+  function writeChatProfilesV25(list){
+    V.writeProfiles(AUTH_ID || AUTH_EMAIL, list);
+  }
+
+  function isVipV25(){ return V.isVipCurrent(); }
+
+  function profileLimitV25(){
+    return isVipV25() ? 10 : 1;
+  }
+
+  function profileIconV25(kind){
+    const map={
+      edit:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 20h4l11-11-4-4L4 16v4z"/><path d="M13.5 6.5l4 4"/></svg>',
+      del:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16"/><path d="M9 7V4h6v3"/><path d="M7 7l1 13h8l1-13"/></svg>',
+      more:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="12" r="1.6"/><circle cx="12" cy="12" r="1.6"/><circle cx="19" cy="12" r="1.6"/></svg>'
+    };
+    return map[kind] || '';
+  }
+
+  function closeProfileMenusV25(){
+    document.querySelectorAll('.profile-menu-v25').forEach(x=>x.hidden=true);
+  }
+
+
+  function setProfileEditorV25(mode, profile=null){
+    profileMode = mode;
+    if(mode === 'existing'){
+      els.profileEditorV25.hidden = true;
+      els.profileLimitV25.hidden = true;
+      return;
+    }
+    els.profileEditorV25.hidden = false;
+    els.profileEditorLabelV25.textContent = mode === 'edit' ? 'Profili düzenle' : 'Yeni profil oluştur';
+    els.profileNickV25.value = profile ? cleanNick(profile.nick) : '';
+    els.profileNickCounterV25.textContent = Array.from(els.profileNickV25.value).length;
+    els.profileLimitV25.hidden = true;
+    setTimeout(()=>els.profileNickV25.focus(),40);
+  }
+
+  function renderProfilesV25(){
+    if(!isRegistered || !els.savedProfilesV25) return;
+    const list = readChatProfilesV25();
+    if(list.length && profileMode==='existing' && !list.some(x=>x.id===selectedProfileId)){
+      selectedProfileId = list[0].id;
+    }
+    if(!list.length){
+      selectedProfileId = '';
+      profileMode = 'new';
+      setProfileEditorV25('new');
+    }
+
+    const allowedCount=profileLimitV25();
+    els.savedProfilesV25.innerHTML = list.map((profile,index)=>{
+      const locked=index>=allowedCount;
+      const checked = !locked && profile.id===selectedProfileId && profileMode==='existing' ? 'checked' : '';
+      return `<div class="saved-profile-row-v25 ${locked?'profile-locked-v31':''}" data-profile-id="${escapeHtml(profile.id)}">
+        <label class="saved-profile-choice-v25">
+          <input type="radio" name="chatProfileV25" value="${escapeHtml(profile.id)}" ${checked} ${locked?'disabled':''}/>
+          <span>${escapeHtml(profile.nick)}</span>${locked?'<small class="profile-vip-lock-v31">VIP</small>':''}
+        </label>
+        <button class="profile-more-v25" type="button" data-profile-more="${escapeHtml(profile.id)}" aria-label="Profil seçenekleri">
+          ${profileIconV25('more')}
+        </button>
+        <div class="profile-menu-v25" data-profile-menu="${escapeHtml(profile.id)}" hidden>
+          <button type="button" data-profile-edit="${escapeHtml(profile.id)}">${profileIconV25('edit')}<span>Düzenle</span></button>
+          <button type="button" data-profile-delete="${escapeHtml(profile.id)}">${profileIconV25('del')}<span>Sil</span></button>
+        </div>
+      </div>`;
+    }).join('');
+
+    updateJoinEnabled();
+  }
+
+  function selectExistingProfileV25(id){
+    const list=readChatProfilesV25();
+    const idx=list.findIndex(x=>x.id===id);
+    if(idx<0) return;
+    if(idx>=profileLimitV25()){els.profileLimitV25.hidden=false;toastV20('Bu ek profil için aktif VIP gerekiyor.');return;}
+    selectedProfileId=id;
+    profileMode='existing';
+    setProfileEditorV25('existing');
+    updateJoinEnabled();
+    renderProfilesV25();
+  }
+
+  function beginNewProfileV25(){
+    const list=readChatProfilesV25();
+    if(list.length>=profileLimitV25()){els.profileLimitV25.hidden=false;toastV20(isVipV25()?'En fazla 10 kayıtlı profil oluşturabilirsin.':'Yeni ek profil oluşturmak için VIP gerekiyor.');return;}
+    selectedProfileId='';
+    setProfileEditorV25('new');
+    updateJoinEnabled();
+    renderProfilesV25();
+  }
+
+  function beginEditProfileV25(id){
+    const profile=readChatProfilesV25().find(x=>x.id===id);
+    if(!profile) return;
+    location.href='profile-edit.html?nick='+encodeURIComponent(profile.nick);
+  }
+
+  function deleteProfileV25(id){
+    const profile=readChatProfilesV25().find(x=>x.id===id);
+    if(!profile) return;
+    if(!confirm(`“${profile.nick}” profilini tamamen silmek istediğinizden emin misiniz? Bu rumuz bir daha kullanılamaz.`)) return;
+    V.reserveDeletedNick(profile.nick);
+    localStorage.removeItem(V.profileDataKey(profile.id));
+    V.removeNickFromAllPresence(profile.nick);
+    const next=readChatProfilesV25().filter(x=>x.id!==id);
+    writeChatProfilesV25(next);
+    if(cleanNick(currentNick).toLocaleLowerCase('tr-TR')===cleanNick(profile.nick).toLocaleLowerCase('tr-TR')){
+      clearInterval(heartbeat);
+      sessionStorage.removeItem(SESSION_NICK);
+      sessionStorage.removeItem(SESSION_JOIN_FLAG);
+      currentNick='';
+      setLoggedInState(false);
+    }
+    if(selectedProfileId===id) selectedProfileId=next[0]?.id || '';
+    if(next.length){
+      profileMode='existing';
+      setProfileEditorV25('existing');
+    }else{
+      profileMode='new';
+      setProfileEditorV25('new');
+    }
+    updateJoinEnabled();
+    renderProfilesV25();
+  }
+
+  function logoutRegisteredV25(){
+    clearInterval(heartbeat);
+    if(currentNick) removePresence(true);
+    sessionStorage.removeItem(SESSION_NICK);
+    sessionStorage.removeItem(SESSION_JOIN_FLAG);
+    sessionStorage.removeItem('sohbetix-v30-open-profile');
+    ['sohbetix-auth-type','sohbetix-auth-nick','sohbetix-auth-email','sohbetix-auth-id'].forEach(k=>localStorage.removeItem(k));
+    location.reload();
+  }
+
+  function registeredNickCandidateV25(){
+    const list=readChatProfilesV25();
+    if(profileMode==='existing'){
+      const idx=list.findIndex(x=>x.id===selectedProfileId);
+      if(idx<0 || idx>=profileLimitV25()) return '';
+      return cleanNick(list[idx]?.nick || '');
+    }
+    return cleanNick(els.profileNickV25?.value || '');
+  }
+
+  function saveRegisteredProfileV25(){
+    const nick=registeredNickCandidateV25();
+    if(!nick) return {ok:false,error:'Bir rumuz yaz.'};
+    const list=readChatProfilesV25();
+    const duplicate=list.some(x=>x.id!==selectedProfileId && x.nick.toLocaleLowerCase('tr-TR')===nick.toLocaleLowerCase('tr-TR'));
+    if(duplicate || !V.nickAvailable(nick, selectedProfileId)) return {ok:false,error:'Bu profil adı kullanılamıyor.'};
+
+    if(profileMode==='new'){
+      if(list.length>=profileLimitV25()){
+        els.profileLimitV25.hidden=false;
+        return {ok:false,error:'limit'};
+      }
+      const profile={id:V.uuid(),ownerId:AUTH_ID || AUTH_EMAIL,nick,createdAt:Date.now()};
+      list.push(profile);
+      writeChatProfilesV25(list);
+      selectedProfileId=profile.id;
+      profileMode='existing';
+      return {ok:true,nick};
+    }
+
+    if(profileMode==='edit'){
+      const idx=list.findIndex(x=>x.id===selectedProfileId);
+      if(idx<0) return {ok:false,error:'Profil bulunamadı.'};
+      list[idx]={...list[idx],nick,updatedAt:Date.now()};
+      writeChatProfilesV25(list);
+      profileMode='existing';
+      return {ok:true,nick};
+    }
+
+    return {ok:true,nick};
+  }
+  function makeColor(nick) {
+    let h = 0; for (const ch of nick) h = (h * 31 + ch.codePointAt(0)) % 360;
+    return `hsl(${h} 70% 38%)`;
+  }
+  function makeAvatar(nick) {
+    const first = Array.from(nick.trim())[0] || '👤';
+    return /[A-Za-zÇĞİÖŞÜçğıöşü0-9]/.test(first) ? first.toLocaleUpperCase('tr-TR') : first;
+  }
+
+  function statusKeyV29(nick=currentNick){
+    const ident = AUTH_ID || cleanNick(nick).toLocaleLowerCase('tr-TR') || clientId;
+    return STATUS_STORAGE_PREFIX + ident;
+  }
+  function normalizeStatusV29(v){
+    return ['online','away','busy'].includes(v) ? v : 'online';
+  }
+  function loadStatusV29(nick=currentNick){
+    return normalizeStatusV29(localStorage.getItem(statusKeyV29(nick)) || 'online');
+  }
+  function statusLabelV29(v){
+    return v==='busy' ? 'Meşgul' : v==='away' ? 'Bir yana' : 'Online';
+  }
+  function updateAccountStatusIconV29(){
+    if(!els.roomAccountStatusIcon) return;
+    els.roomAccountStatusIcon.dataset.status=currentStatus;
+    els.roomAccountStatusIcon.title=statusLabelV29(currentStatus);
+    document.querySelectorAll('[data-presence-status]').forEach(btn=>{
+      btn.classList.toggle('active', btn.dataset.presenceStatus===currentStatus);
+    });
+  }
+  function setPresenceStatusV29(status){
+    currentStatus=normalizeStatusV29(status);
+    localStorage.setItem(statusKeyV29(), currentStatus);
+    updateAccountStatusIconV29();
+    if(currentNick) heartbeatPresence();
+    renderPresence();
+  }
+  function presenceStatusHtmlV29(status){
+    status=normalizeStatusV29(status);
+    const label=statusLabelV29(status);
+    return `<span class="presence-status-v29 ${status}" title="${label}" aria-label="${label}"><i></i></span>`;
+  }
+
+  function isOwnSelectableMessageV29(msg){
+    return !!(isRegistered && currentNick && msg && ['chat','image','voice'].includes(msg.type) &&
+      cleanNick(msg.nick).toLocaleLowerCase('tr-TR')===cleanNick(currentNick).toLocaleLowerCase('tr-TR'));
+  }
+  function ownMessageCheckboxV29(msg){
+    if(!isOwnSelectableMessageV29(msg)) return '';
+    const checked=selectedMessageIdsV29.has(String(msg.id))?' checked':'';
+    return `<label class="own-message-select-wrap-v29" title="Mesajı seç"><input class="own-message-select-v29" type="checkbox" data-message-id="${escapeHtml(msg.id)}"${checked}><span></span></label>`;
+  }
+  function updateMessageSelectionMenuV29(){
+    if(!els.messageSelectionMenuV29) return;
+    els.messageSelectionMenuV29.hidden = !isRegistered || selectedMessageIdsV29.size===0;
+  }
+  function clearMessageSelectionV29(){
+    selectedMessageIdsV29.clear();
+    updateMessageSelectionMenuV29();
+    els.messages?.querySelectorAll('.own-message-select-v29').forEach(x=>x.checked=false);
+  }
+  function deleteSelectedMessagesV29(){
+    if(!isRegistered || !selectedMessageIdsV29.size) return;
+    if(activePrivateNick){
+      let list=readPrivateMessagesV29(activePrivateNick);
+      list=list.filter(msg=>!(
+        selectedMessageIdsV29.has(String(msg.id)) &&
+        cleanNick(msg.sender).toLocaleLowerCase('tr-TR')===cleanNick(currentNick).toLocaleLowerCase('tr-TR')
+      ));
+      writePrivateMessagesV29(activePrivateNick,list);
+      clearMessageSelectionV29();
+      renderPrivateMessagesV29();
+      return;
+    }
+    let list=readMessages();
+    list=list.filter(msg=>!(
+      selectedMessageIdsV29.has(String(msg.id)) &&
+      ['chat','image','voice'].includes(msg.type) &&
+      cleanNick(msg.nick).toLocaleLowerCase('tr-TR')===cleanNick(currentNick).toLocaleLowerCase('tr-TR')
+    ));
+    writeMessages(list);
+    clearMessageSelectionV29();
+    renderMessages();
+  }
+
+  function userVisualV29(nick){
+    const ctx=V.profileContext(nick);
+    const d=ctx.data||V.defaultProfileData();
+    const gender=d.gender==='male'?'👦':d.gender==='female'?'👩':'👤';
+    return {
+      registered:!!ctx.profile, vip:!!ctx.vip, gender, photo:d.photo||'',
+      nickColor:d.nickColor||makeColor(nick), textColor:d.textColor||'#333333',
+      boldNick:!!d.boldNick&&!!ctx.vip, boldText:!!d.boldText&&!!ctx.vip, privateEnabled:d.privateEnabled!==false
+    };
+  }
+
+  function avatarHtmlV29(nick,small=false){
+    const v=userVisualV29(nick);
+    const inner=v.photo?`<img src="${escapeHtml(v.photo)}" alt="">`:escapeHtml(v.registered?v.gender:makeAvatar(nick));
+    return `<span class="${small?'room-mini-avatar-v15 ':''}user-avatar-v28 ${v.registered?'registered':'guest'} ${v.vip?'vip':''}">${inner}${v.vip?'<i>★</i>':''}</span>`;
+  }
+
+  function isNearMessagesBottom() {
+    if (!els.messages) return true;
+    return els.messages.scrollHeight - els.messages.scrollTop - els.messages.clientHeight < 72;
+  }
+
+  function updateLatestMessagesButton() {
+    if (!els.latestMessagesBtn || !els.messages) return;
+    if (!currentNick) { els.latestMessagesBtn.hidden = true; return; }
+    const canScroll = els.messages.scrollHeight > els.messages.clientHeight + 8;
+    els.latestMessagesBtn.hidden = !canScroll || isNearMessagesBottom();
+  }
+
+  function scrollToLatestMessages(smooth = true) {
+    if (!els.messages) return;
+    els.messages.scrollTo({top:els.messages.scrollHeight, behavior:smooth ? 'smooth' : 'auto'});
+    setTimeout(updateLatestMessagesButton, smooth ? 260 : 0);
+  }
+
+  function normalizeRegisteredFlag(value) {
+    return value === true || value === 1 || value === '1' || value === 'true' || value === 'registered';
+  }
+
+  function targetRegistrationByNick(nick, fallback=false) {
+    const key=String(nick||'').toLocaleLowerCase('tr-TR');
+    const presence=Object.values(prunePresence(readPresence()));
+    const found=presence.find(u=>String(u.nick||'').toLocaleLowerCase('tr-TR')===key);
+    if(found) return normalizeRegisteredFlag(found.registered);
+    return !!V.getProfileByNick(nick) || normalizeRegisteredFlag(fallback);
+  }
+
+
+  function isBlockedWithV30(nick){
+    return !!(currentNick && nick && V.isBlockedBetween(currentNick,nick));
+  }
+  function closeBlockedPrivateTabsV30(){
+    for(const nick of [...openedPrivateNicks]) if(isBlockedWithV30(nick)) openedPrivateNicks.delete(nick);
+    if(activePrivateNick && isBlockedWithV30(activePrivateNick)) activePrivateNick='';
+    renderPrivateTabsV29();
+  }
+
+  function iconSvg(kind) {
+    const icons={
+      mention:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M16 8v6a2 2 0 0 0 4 0v-2a8 8 0 1 0-2.3 5.7"/><circle cx="12" cy="12" r="3"/></svg>',
+      private:'<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 5h16v11H9l-5 4V5z"/></svg>',
+      profile:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/></svg>',
+      ignore:'<svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="9"/><path d="M6 6l12 12"/></svg>'
+    };
+    return icons[kind]||'';
+  }
+
+  function closeUserMenu() {
+    document.querySelectorAll('.sohbetix-user-menu-v20').forEach(el=>el.remove());
+  }
+
+  function toastV20(text) {
+    document.querySelectorAll('.private-toast-v18').forEach(el=>el.remove());
+    const t=document.createElement('div');
+    t.className='private-toast-v18';
+    t.textContent=text;
+    document.body.appendChild(t);
+    setTimeout(()=>t.remove(),2200);
+  }
+
+  function showUserMenu(nick, registered, anchor) {
+    nick=cleanNick(nick);
+    if(!nick || nick===BOT_NICK) return;
+    closeUserMenu();
+    const menu=document.createElement('div');
+    menu.className='sohbetix-user-menu-v20';
+    menu.setAttribute('role','menu');
+    const uv=userVisualV29(nick);
+    menu.innerHTML=`<div class="sohbetix-user-menu-head-v20">${avatarHtmlV29(nick)}<strong>${escapeHtml(nick)}</strong></div>
+      <button type="button" data-action="mention">${iconSvg('mention')}<span>Bahset</span></button>
+      ${(currentNick&&uv.privateEnabled)?`<button type="button" data-action="private">${iconSvg('private')}<span>Gizli</span></button>`:''}
+      ${registered?`<button type="button" data-action="profile">${iconSvg('profile')}<span>Profil</span></button>`:''}
+      ${(registered&&isRegistered&&cleanNick(nick).toLocaleLowerCase('tr-TR')!==cleanNick(currentNick).toLocaleLowerCase('tr-TR'))?`<button type="button" data-action="ignore">${iconSvg('ignore')}<span>Yoksay</span></button>`:''}`;
+    document.body.appendChild(menu);
+    const rect=anchor?.getBoundingClientRect?.() || {left:12,top:80,bottom:110,right:120};
+    const mw=Math.min(230, window.innerWidth-16);
+    menu.style.width=mw+'px';
+    let left=Math.min(Math.max(8,rect.left), window.innerWidth-mw-8);
+    let top=rect.bottom+6;
+    const mh=menu.offsetHeight||220;
+    if(top+mh>window.innerHeight-8) top=Math.max(8,rect.top-mh-6);
+    menu.style.left=left+'px'; menu.style.top=top+'px';
+    menu.addEventListener('click',e=>{
+      const btn=e.target.closest('button[data-action]'); if(!btn)return;
+      const action=btn.dataset.action;
+      if(action==='mention'){
+        if(!currentNick){openJoinModal(); closeUserMenu(); return;}
+        const prefix='@'+nick+' ';
+        const cur=els.messageInput.value||'';
+        els.messageInput.value=(cur && !cur.endsWith(' ')?cur+' ':'')+prefix;
+        els.messageInput.focus();
+      } else if(action==='private'){
+        if(!currentNick){ openJoinModal(); closeUserMenu(); return; }
+        openPrivateConversationV29(nick);
+      } else if(action==='profile'){
+        location.href='profile.html?nick='+encodeURIComponent(nick);
+      } else if(action==='ignore' && registered){
+        if(cleanNick(nick).toLocaleLowerCase('tr-TR')===cleanNick(currentNick).toLocaleLowerCase('tr-TR')){closeUserMenu();return;}
+        V.ignoreNick(nick);
+        closePrivateConversationV29(nick);
+        closeBlockedPrivateTabsV30();
+        renderPresence();
+        renderActiveConversationV29();
+        toastV20(`${nick} yoksayıldı. Artık birbirinizi göremezsiniz.`);
+      }
+      closeUserMenu();
+    });
+  }
+
+
+  function containsLinkV32(text){
+    return /(?:https?:\/\/|www\.|(?:[a-z0-9-]+\.)+(?:com|net|org|io|co|me|tv|gg|online|site|link|app|dev|xyz|tr)(?:\/|\b))/iu.test(String(text||''));
+  }
+  function linkifyPrivateTextV32(text, allowLinks){
+    const safe=renderChatText(text||'');
+    if(!allowLinks) return safe;
+    const urlRx=/(https?:\/\/[^\s<]+|www\.[^\s<]+)/giu;
+    return safe.replace(urlRx,(raw)=>{
+      const href=raw.toLowerCase().startsWith('www.')?'https://'+raw:raw;
+      return `<a class="private-link-v32" href="${escapeHtml(href)}" target="_blank" rel="noopener noreferrer">${raw}</a>`;
+    });
+  }
+  function emitPrivateNotificationV32(targetNick,msg){
+    const payload={id:msg.id,room:String(cfg.slug||'sohbetix'),sender:cleanNick(currentNick),receiver:cleanNick(targetNick),type:msg.type||'chat',text:(msg.type==='voice'?'🎙️ Sesli mesaj':String(msg.text||'').slice(0,140)),at:Date.now()};
+    try{privateChannelV32?.postMessage(payload);}catch{}
+    try{localStorage.setItem(PRIVATE_NOTIFY_PREFIX+encodeURIComponent(cleanNick(targetNick).toLocaleLowerCase('tr-TR')),JSON.stringify(payload));}catch{}
+  }
+
+  const VOICE_DB_NAME='sohbetix-v34-media';
+  const VOICE_STORE='voice';
+  const VOICE_MAX_MS=5*60*1000;
+  const voiceObjectUrlsV34=new Map();
+  let voiceRecorderV34=null, voiceStreamV34=null, voiceChunksV34=[], voiceStartedAtV34=0, voiceTimerV34=null, voiceStopTimerV34=null;
+  function openVoiceDbV34(){return new Promise((resolve,reject)=>{const req=indexedDB.open(VOICE_DB_NAME,1);req.onupgradeneeded=()=>{const db=req.result;if(!db.objectStoreNames.contains(VOICE_STORE))db.createObjectStore(VOICE_STORE);};req.onsuccess=()=>resolve(req.result);req.onerror=()=>reject(req.error);});}
+  async function saveVoiceBlobV34(key,blob){const db=await openVoiceDbV34();return new Promise((resolve,reject)=>{const tx=db.transaction(VOICE_STORE,'readwrite');tx.objectStore(VOICE_STORE).put(blob,key);tx.oncomplete=()=>{db.close();resolve(true)};tx.onerror=()=>{db.close();reject(tx.error)};});}
+  async function getVoiceBlobV34(key){const db=await openVoiceDbV34();return new Promise((resolve,reject)=>{const tx=db.transaction(VOICE_STORE,'readonly');const req=tx.objectStore(VOICE_STORE).get(key);req.onsuccess=()=>{const v=req.result;db.close();resolve(v||null)};req.onerror=()=>{db.close();reject(req.error)};});}
+  function formatVoiceDurationV34(sec){sec=Math.max(0,Math.floor(Number(sec)||0));const m=Math.floor(sec/60),s=sec%60;return `${String(m).padStart(2,'0')}:${String(s).padStart(2,'0')}`;}
+  function voiceMessageHtmlV34(msg,sender,registered,privateMode=false){const duration=formatVoiceDurationV34(msg.duration||0);const vv=userVisualV29(sender);return `<article class="live-message-v15 ${privateMode?'private-message-v28 ':''}voice-message-v34 user-target-v20" data-user-nick="${escapeHtml(sender)}" data-user-registered="${registered?'1':'0'}">${avatarHtmlV29(sender)}<div class="live-message-body-v15"><div class="live-message-meta-v15"><b style="color:${vv.nickColor};font-weight:${vv.boldNick?'900':'700'};text-decoration:${vv.boldNick?'underline':'none'}">${escapeHtml(sender)}</b><small>${escapeHtml(msg.time||'')}</small></div><div class="voice-bubble-v34"><button class="voice-play-fallback-v34" type="button" aria-label="Sesli mesajı oynat">▶</button><audio class="voice-audio-v34" controls preload="metadata" data-voice-key="${escapeHtml(msg.audioKey||'')}"></audio><span>${duration}</span></div></div>${ownMessageCheckboxV29({id:msg.id,type:'voice',nick:sender})}</article>`;}
+  async function hydrateVoicePlayersV34(){const nodes=[...els.messages.querySelectorAll('audio.voice-audio-v34[data-voice-key]')];for(const a of nodes){const key=a.dataset.voiceKey;if(!key||a.src)continue;try{let url=voiceObjectUrlsV34.get(key);if(!url){const blob=await getVoiceBlobV34(key);if(!blob)continue;url=URL.createObjectURL(blob);voiceObjectUrlsV34.set(key,url);}a.src=url;const fallback=a.parentElement?.querySelector('.voice-play-fallback-v34');if(fallback)fallback.hidden=true;}catch{}}}
+  function updateVoiceButtonV34(recording){if(!els.voiceRecordButtonV34)return;els.voiceRecordButtonV34.classList.toggle('recording',recording);els.voiceRecordButtonV34.setAttribute('aria-label',recording?'Kaydı durdur':'Sesli mesaj kaydet');if(els.voiceRecordTimeV34)els.voiceRecordTimeV34.hidden=!recording;}
+  function stopVoiceRecordingV34(){if(voiceRecorderV34&&voiceRecorderV34.state!=='inactive')voiceRecorderV34.stop();}
+  async function startVoiceRecordingV34(){if(!currentNick){openJoinModal();return;}if(!navigator.mediaDevices?.getUserMedia||!window.MediaRecorder){toastV20('Bu tarayıcı sesli mesaj kaydını desteklemiyor.');return;}try{voiceStreamV34=await navigator.mediaDevices.getUserMedia({audio:true});voiceChunksV34=[];let opts={audioBitsPerSecond:32000};const preferred=['audio/webm;codecs=opus','audio/webm','audio/mp4'];for(const m of preferred){if(MediaRecorder.isTypeSupported?.(m)){opts.mimeType=m;break;}}try{voiceRecorderV34=new MediaRecorder(voiceStreamV34,opts);}catch{voiceRecorderV34=new MediaRecorder(voiceStreamV34);}voiceRecorderV34.ondataavailable=e=>{if(e.data&&e.data.size)voiceChunksV34.push(e.data);};voiceRecorderV34.onstop=async()=>{clearInterval(voiceTimerV34);clearTimeout(voiceStopTimerV34);const duration=Math.min(300,Math.max(1,Math.round((Date.now()-voiceStartedAtV34)/1000)));const blob=new Blob(voiceChunksV34,{type:voiceRecorderV34?.mimeType||'audio/webm'});voiceStreamV34?.getTracks?.().forEach(t=>t.stop());voiceStreamV34=null;voiceRecorderV34=null;updateVoiceButtonV34(false);if(els.voiceRecordTimeV34)els.voiceRecordTimeV34.textContent='00:00';if(!blob.size)return;if(blob.size>10*1024*1024){toastV20('Ses kaydı 10 MB sınırını aştı. Daha kısa kayıt gönder.');return;}const key=`voice-${Date.now()}-${Math.random().toString(36).slice(2)}`;try{await saveVoiceBlobV34(key,blob);if(activePrivateNick)addPrivateMessageV29(activePrivateNick,{type:'voice',audioKey:key,duration,mime:blob.type});else addMessage('voice',{nick:currentNick,audioKey:key,duration,mime:blob.type});renderActiveConversationV29(true);}catch{toastV20('Ses kaydı tarayıcı depolamasına kaydedilemedi.');}};voiceRecorderV34.start(500);voiceStartedAtV34=Date.now();updateVoiceButtonV34(true);voiceTimerV34=setInterval(()=>{const sec=Math.min(300,Math.floor((Date.now()-voiceStartedAtV34)/1000));if(els.voiceRecordTimeV34)els.voiceRecordTimeV34.textContent=formatVoiceDurationV34(sec);},500);voiceStopTimerV34=setTimeout(()=>stopVoiceRecordingV34(),VOICE_MAX_MS);toastV20('Ses kaydı başladı. Bitirmek için mikrofon butonuna tekrar bas.');}catch(err){voiceStreamV34?.getTracks?.().forEach(t=>t.stop());voiceStreamV34=null;updateVoiceButtonV34(false);toastV20('Mikrofon izni verilmedi veya mikrofon kullanılamıyor.');}}
+
+  function showPrivateNotificationV34(payload){if(!payload||!currentNick)return;if(cleanNick(payload.receiver).toLocaleLowerCase('tr-TR')!==cleanNick(currentNick).toLocaleLowerCase('tr-TR'))return;if(cleanNick(payload.sender).toLocaleLowerCase('tr-TR')===cleanNick(currentNick).toLocaleLowerCase('tr-TR'))return;if(isBlockedWithV30(payload.sender))return;document.querySelectorAll('.private-notification-v32,.private-notification-v34').forEach(x=>x.remove());const n=document.createElement('button');n.type='button';n.className='private-notification-v32 private-notification-v34';n.innerHTML=`<strong>${escapeHtml(payload.sender)} kişisinden gizli mesaj</strong><span>${escapeHtml(payload.text||'Yeni mesaj')}</span><small>Görmek için dokun</small>`;document.body.appendChild(n);n.addEventListener('click',()=>{n.remove();openPrivateConversationV29(payload.sender);});setTimeout(()=>n.remove(),7000);}
+  if(privateChannelV32) privateChannelV32.addEventListener('message',e=>showPrivateNotificationV34(e.data));
+
+  function privatePairKeyV29(targetNick){
+    const a=cleanNick(currentNick).toLocaleLowerCase('tr-TR');
+    const b=cleanNick(targetNick).toLocaleLowerCase('tr-TR');
+    return [a,b].sort((x,y)=>x.localeCompare(y,'tr')).map(encodeURIComponent).join('~');
+  }
+  function privateStorageKeyV29(targetNick){return PRIVATE_STORAGE_PREFIX + privatePairKeyV29(targetNick);}
+  function privateMetaKeyV30(targetNick){return PRIVATE_META_PREFIX + privatePairKeyV29(targetNick);}
+  function readPrivateMetaV30(targetNick){return safeParse(localStorage.getItem(privateMetaKeyV30(targetNick)),null);}
+  function ensurePrivateMetaV30(targetNick){
+    const key=privateMetaKeyV30(targetNick); let meta=safeParse(localStorage.getItem(key),null);
+    const targetRegistered=targetRegistrationByNick(targetNick,false);
+    if(!meta){
+      meta={participants:[cleanNick(currentNick),cleanNick(targetNick)],registered:[!!isRegistered,!!targetRegistered],persistent:!!isRegistered&&!!targetRegistered,createdAt:Date.now(),lastAt:Date.now()};
+    }else{
+      meta.lastAt=Date.now();
+      const flags=Array.isArray(meta.registered)?meta.registered:[];
+      meta.persistent=!!(meta.persistent || (flags.length===2&&flags.every(Boolean)) || (!!isRegistered&&!!targetRegistered));
+    }
+    localStorage.setItem(key,JSON.stringify(meta)); return meta;
+  }
+  function readPrivateMessagesV29(targetNick){
+    if(!currentNick || !targetNick || isBlockedWithV30(targetNick)) return [];
+    const list=safeParse(localStorage.getItem(privateStorageKeyV29(targetNick)),[]);
+    return Array.isArray(list) ? list : [];
+  }
+  function writePrivateMessagesV29(targetNick,list){
+    if(isBlockedWithV30(targetNick)) return false;
+    ensurePrivateMetaV30(targetNick);
+    localStorage.setItem(privateStorageKeyV29(targetNick),JSON.stringify(list.slice(-3000))); return true;
+  }
+  function privateParticipantOnlineV30(nick,presence){
+    const n=cleanNick(nick).toLocaleLowerCase('tr-TR');
+    return Object.values(presence||{}).some(x=>x&&cleanNick(x.nick).toLocaleLowerCase('tr-TR')===n&&presenceItemActiveV32(x));
+  }
+  function cleanupEphemeralPrivateV30(presence=readPresence()){
+    const keys=[]; for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(PRIVATE_META_PREFIX))keys.push(k);}
+    for(const metaKey of keys){
+      const meta=safeParse(localStorage.getItem(metaKey),null); if(!meta||meta.persistent)continue;
+      const parts=Array.isArray(meta.participants)?meta.participants.filter(Boolean):[]; if(parts.length<2)continue;
+      if(parts.every(n=>!privateParticipantOnlineV30(n,presence))){
+        const suffix=metaKey.slice(PRIVATE_META_PREFIX.length);
+        localStorage.removeItem(PRIVATE_STORAGE_PREFIX+suffix); localStorage.removeItem(metaKey);
+      }
+    }
+  }
+  function appendPrivatePresenceEventV31(type,nick,registered=false){
+    nick=cleanNick(nick); if(!nick)return;
+    const metaKeys=[];
+    for(let i=0;i<localStorage.length;i++){const k=localStorage.key(i);if(k&&k.startsWith(PRIVATE_META_PREFIX))metaKeys.push(k);}
+    for(const metaKey of metaKeys){
+      const meta=safeParse(localStorage.getItem(metaKey),null); if(!meta)continue;
+      const parts=Array.isArray(meta.participants)?meta.participants.map(cleanNick):[];
+      if(!parts.some(x=>x.toLocaleLowerCase('tr-TR')===nick.toLocaleLowerCase('tr-TR')))continue;
+      const suffix=metaKey.slice(PRIVATE_META_PREFIX.length);
+      const storageKey=PRIVATE_STORAGE_PREFIX+suffix;
+      const list=safeParse(localStorage.getItem(storageKey),[]);
+      const arr=Array.isArray(list)?list:[];
+      const last=arr[arr.length-1];
+      if(last && last.type===type && cleanNick(last.sender).toLocaleLowerCase('tr-TR')===nick.toLocaleLowerCase('tr-TR') && Date.now()-Number(last.at||0)<2500)continue;
+      arr.push({id:`pm-pres-${Date.now()}-${Math.random().toString(36).slice(2)}`,type,sender:nick,registered:!!registered,at:Date.now(),time:nowTime(),system:true});
+      localStorage.setItem(storageKey,JSON.stringify(arr.slice(-3000)));
+    }
+    if(activePrivateNick)renderPrivateMessagesV29(true);
+  }
+
+  function announcePresenceV31(type,nick,registered=false){
+    addMessage(type,{nick,registered:!!registered});
+    appendPrivatePresenceEventV31(type,nick,registered);
+  }
+
+  function addPrivateMessageV29(targetNick,payload={}){
+    targetNick=cleanNick(targetNick);
+    if(!currentNick || !targetNick) return;
+    if(isBlockedWithV30(targetNick)){toastV20('Yoksay nedeniyle bu kullanıcıyla gizli sohbet kullanılamaz.');return;}
+    const meta=ensurePrivateMetaV30(targetNick);
+    const list=readPrivateMessagesV29(targetNick);
+    const msg={id:`pm-${Date.now()}-${Math.random().toString(36).slice(2)}`,sender:currentNick,receiver:targetNick,type:payload.type||'chat',text:String(payload.text||'').slice(0,512),data:String(payload.data||''),audioKey:String(payload.audioKey||''),duration:Number(payload.duration||0),mime:String(payload.mime||''),at:Date.now(),time:nowTime(),registered:isRegistered,senderVip:!!isVipV25(),persistent:!!meta.persistent};
+    list.push(msg);
+    if(writePrivateMessagesV29(targetNick,list)) emitPrivateNotificationV32(targetNick,msg);
+    renderPrivateMessagesV29(true);
+  }
+
+  function renderPrivateTabsV29(){
+    if(!els.privateTabsV29 || !els.mainChatTabV29) return;
+    els.mainChatTabV29.classList.toggle('active',!activePrivateNick);
+    els.privateTabsV29.innerHTML=[...openedPrivateNicks].map(nick=>`
+      <div class="private-tab-v28 ${activePrivateNick===nick?'active':''}" data-private-tab="${escapeHtml(nick)}">
+        <button class="private-tab-open-v28" type="button" data-private-open="${escapeHtml(nick)}">
+          <span class="private-tab-avatar-v28" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M5 20c.7-4.2 3.1-6.3 7-6.3s6.3 2.1 7 6.3"/></svg>
+          </span>
+          <span>${escapeHtml(nick)}</span>
+        </button>
+        <button class="private-tab-close-v28" type="button" data-private-close="${escapeHtml(nick)}" aria-label="${escapeHtml(nick)} gizli sohbetini kapat">×</button>
+      </div>`).join('');
+    requestAnimationFrame(()=>{
+      const active=els.privateTabsV29.querySelector('.private-tab-v28.active');
+      active?.scrollIntoView?.({behavior:'smooth',block:'nearest',inline:'nearest'});
+    });
+  }
+
+  function showMainConversationV29(){
+    clearMessageSelectionV29();
+    activePrivateNick='';
+    sessionStorage.removeItem('sohbetix-v34-active-private');
+    renderPrivateTabsV29();
+    renderMessages(true);
+    els.messageInput.placeholder=cfg.language==='en'?'Write a message...':'Mesajını yaz...';
+  }
+
+  function openPrivateConversationV29(nick){
+    clearMessageSelectionV29();
+    nick=cleanNick(nick);
+    if(!nick || nick===BOT_NICK) return;
+    if(isBlockedWithV30(nick)){toastV20('Yoksay nedeniyle bu kullanıcıyla gizli sohbet açılamaz.');return;}
+    ensurePrivateMetaV30(nick);
+    openedPrivateNicks.add(nick);
+    activePrivateNick=nick;
+    sessionStorage.setItem('sohbetix-v34-active-private',nick);
+    renderPrivateTabsV29();
+    renderPrivateMessagesV29(true);
+    els.messageInput.placeholder=`${nick} kişisine gizli mesaj yaz...`;
+    setTimeout(()=>els.messageInput.focus(),30);
+  }
+
+  function closePrivateConversationV29(nick){
+    nick=cleanNick(nick);
+    openedPrivateNicks.delete(nick);
+    if(activePrivateNick===nick){
+      const left=[...openedPrivateNicks];
+      if(left.length){
+        activePrivateNick=left[left.length-1];
+        sessionStorage.setItem('sohbetix-v34-active-private',activePrivateNick);
+        renderPrivateTabsV29();
+        renderPrivateMessagesV29(true);
+        els.messageInput.placeholder=`${activePrivateNick} kişisine gizli mesaj yaz...`;
+      }else{
+        showMainConversationV29();
+      }
+    }else{
+      renderPrivateTabsV29();
+    }
+  }
+
+  function renderPrivateMessagesV29(forceBottom=false){
+    if(!activePrivateNick){ renderMessages(forceBottom); return; }
+    if(isBlockedWithV30(activePrivateNick)){closePrivateConversationV29(activePrivateNick);renderMessages(forceBottom);return;}
+    const list=readPrivateMessagesV29(activePrivateNick);
+    const wasNearBottom=isNearMessagesBottom();
+    const previousScrollTop=els.messages.scrollTop;
+    if(!list.length){
+      els.messages.innerHTML=`<div class="private-empty-v28"><strong>${escapeHtml(activePrivateNick)}</strong> ile gizli sohbet başladı.<br><span>Mesajlarını yalnızca bu gizli sohbet sekmesinde görürsün.</span></div>`;
+    }else{
+      els.messages.innerHTML=list.map(msg=>{
+        const sender=cleanNick(msg.sender||'');
+        const registered=normalizeRegisteredFlag(msg.registered) || targetRegistrationByNick(sender,false);
+        if(msg.type==='join' || msg.type==='leave'){
+          const vv=userVisualV29(sender||'');
+          const text=msg.type==='join'?(cfg.language==='en'?'joined us...':'bize katılıyor...'):(cfg.language==='en'?'left us...':'bizi terk ediyor...');
+          return `<div class="system-message-v15 private-presence-v31 ${msg.type==='leave'?'leave':''}" data-user-nick="${escapeHtml(sender)}" data-user-registered="${registered?'1':'0'}"><button class="system-nick-v15" style="color:${vv.nickColor};font-weight:${vv.boldNick?'900':'800'};text-decoration:${vv.boldNick?'underline':'none'}" type="button">@${escapeHtml(sender)}</button> <span>${text}</span> <small>${escapeHtml(msg.time||'')}</small></div>`;
+        }
+        if(msg.type==='image'){
+          return `<article class="live-message-v15 private-message-v28 user-target-v20" data-user-nick="${escapeHtml(sender)}" data-user-registered="${registered?'1':'0'}">${avatarHtmlV29(sender)}<div class="live-message-body-v15"><div class="live-message-meta-v15"><b style="color:${userVisualV29(sender).nickColor};font-weight:${userVisualV29(sender).boldNick?'900':'700'};text-decoration:${userVisualV29(sender).boldNick?'underline':'none'}">${escapeHtml(sender)}</b><small>${escapeHtml(msg.time||'')}</small></div><img class="live-image-v18" src="${escapeHtml(msg.data||'')}" alt="Gizli paylaşılan resim"></div>${ownMessageCheckboxV29({id:msg.id,type:'image',nick:sender})}</article>`;
+        }
+        if(msg.type==='voice') return voiceMessageHtmlV34(msg,sender,registered,true);
+        return `<article class="live-message-v15 private-message-v28 user-target-v20 ${messageMentionsCurrentV29(msg.text)?'message-mentions-me-v29':''}" data-user-nick="${escapeHtml(sender)}" data-user-registered="${registered?'1':'0'}">${avatarHtmlV29(sender)}<div class="live-message-body-v15"><div class="live-message-meta-v15"><b style="color:${userVisualV29(sender).nickColor};font-weight:${userVisualV29(sender).boldNick?'900':'700'};text-decoration:${userVisualV29(sender).boldNick?'underline':'none'}">${escapeHtml(sender)}</b><small>${escapeHtml(msg.time||'')}</small></div><p style="color:${userVisualV29(sender).textColor};font-weight:${userVisualV29(sender).boldText?'800':'400'};text-decoration:${userVisualV29(sender).boldText?'underline':'none'}">${linkifyPrivateTextV32(msg.text||'',!!msg.senderVip)}</p></div>${ownMessageCheckboxV29({id:msg.id,type:'chat',nick:sender})}</article>`;
+      }).join('');
+    }
+    if(forceBottom || wasNearBottom) els.messages.scrollTop=els.messages.scrollHeight;
+    else els.messages.scrollTop=previousScrollTop;
+    updateMessageSelectionMenuV29();
+    requestAnimationFrame(updateLatestMessagesButton);
+    hydrateVoicePlayersV34();
+  }
+
+  function renderActiveConversationV29(forceBottom=false){
+    if(activePrivateNick) renderPrivateMessagesV29(forceBottom);
+    else renderMessages(forceBottom);
+  }
+
+
+  function regexEscapeV29(v){return String(v||'').replace(/[.*+?^${}()|[\]\\]/g,'\\$&');}
+  function messageMentionsCurrentV29(text){
+    if(!currentNick) return false;
+    const rx=new RegExp('(^|\\s)@'+regexEscapeV29(currentNick)+'(?=\\s|$|[.,!?;:])','iu');
+    return rx.test(String(text||''));
+  }
+  function renderChatText(text) {
+    const safe = escapeHtml(text || '');
+    if(!currentNick) return safe;
+    const escapedNick=escapeHtml(currentNick);
+    const rx=new RegExp('(^|\\s)@'+regexEscapeV29(escapedNick)+'(?=\\s|$|[.,!?;:])','giu');
+    return safe.replace(rx,(m,prefix)=>prefix+'<span class="mention-tag-v29">@'+escapedNick+'</span>');
+  }
+
+  function leaveSeenMap() { return safeParse(localStorage.getItem(STORAGE_LEAVE_SEEN), {}); }
+  function announceDroppedPresence(id, item) {
+    if (!item || !item.nick) return;
+    const seen = leaveSeenMap();
+    const key = `${id}|${Number(item.lastSeen||0)}`;
+    if (seen[key]) return;
+    const now = Date.now();
+    for (const [k,v] of Object.entries(seen)) if (now - Number(v||0) > 10*60*1000) delete seen[k];
+    seen[key] = now;
+    localStorage.setItem(STORAGE_LEAVE_SEEN, JSON.stringify(seen));
+    announcePresenceV31('leave', item.nick, normalizeRegisteredFlag(item.registered));
+  }
+
+  function presenceItemActiveV32(item,now=Date.now()){
+    if(!item)return false;
+    const last=Number(item.lastSeen||0), closing=Number(item.closingAt||0);
+    if(closing>0) return now-closing<8000;
+    if(item.suspended) return now-last<=12*60*60*1000;
+    return now-last<=PRESENCE_TTL;
+  }
+  function sweepExpiredPresence(presence) {
+    const now = Date.now();
+    let changed = false;
+    for (const [id, item] of Object.entries(presence)) {
+      if (!presenceItemActiveV32(item,now)) {
+        const sameNickStillOnline = !!(item && item.nick && Object.entries(presence).some(([otherId,other]) =>
+          otherId !== id && other &&
+          cleanNick(other.nick).toLocaleLowerCase('tr-TR') === cleanNick(item.nick).toLocaleLowerCase('tr-TR') &&
+          presenceItemActiveV32(other,now)
+        ));
+        if (item && item.nick && !sameNickStillOnline) announceDroppedPresence(id, item);
+        delete presence[id];
+        changed = true;
+      }
+    }
+    if (changed) writePresence(presence);
+    cleanupEphemeralPrivateV30(presence);
+    return presence;
+  }
+
+  function closeComposerPopups(except='') {
+    if (els.emojiPanel && except !== 'emoji') els.emojiPanel.hidden = true;
+    if (els.mentionSuggest && except !== 'mention') els.mentionSuggest.hidden = true;
+  }
+
+  function insertAtCaret(text) {
+    const input = els.messageInput;
+    const start = input.selectionStart ?? input.value.length;
+    const end = input.selectionEnd ?? input.value.length;
+    input.value = input.value.slice(0,start) + text + input.value.slice(end);
+    const pos = start + text.length;
+    input.setSelectionRange(pos,pos);
+    input.focus();
+    input.dispatchEvent(new Event('input',{bubbles:true}));
+  }
+
+  function initEmojiPanelV23() {
+    if (!els.emojiGrid || !els.smileyBtn) return;
+    const emojis = [(isVipV25()?'👑':null),(isVipV25()?'💎':null),(isVipV25()?'🪙':null),'😀','😃','😄','😁','😂','🤣','😊','😍','🥰','😘','😢','😭','😞','😔','☹️','🙁','😥','😓','😩','😫','🥺','😡','🤬','😎','🤗','🤔','👍','👎','❤️','💔','🔥','🎉','🌹','⭐','🙏','👏','👋','👌','💯','🎈','✨','😴','🤭','🙄','😇','🤩','🥳','😜','😋'].filter(Boolean);
+    els.emojiGrid.innerHTML = emojis.map(x=>`<button type="button" data-emoji="${x}" aria-label="${x}">${x}</button>`).join('');
+    els.smileyBtn.addEventListener('click', e=>{
+      e.stopPropagation();
+      const willOpen = els.emojiPanel.hidden;
+      closeComposerPopups('emoji');
+      els.emojiPanel.hidden = !willOpen;
+    });
+    els.emojiGrid.addEventListener('click',e=>{
+      const b=e.target.closest('[data-emoji]'); if(!b)return;
+      insertAtCaret(b.dataset.emoji);
+    });
+  }
+
+  function currentMentionQuery() {
+    const input=els.messageInput;
+    const pos=input.selectionStart ?? input.value.length;
+    const before=input.value.slice(0,pos);
+    const m=before.match(/(?:^|\s)@([^\s@]*)$/);
+    if(!m)return null;
+    return {query:m[1], start:pos-m[1].length-1, end:pos};
+  }
+
+  function renderMentionSuggestions() {
+    if(!els.mentionSuggest || !currentNick){ if(els.mentionSuggest)els.mentionSuggest.hidden=true; return; }
+    const m=currentMentionQuery();
+    if(!m){els.mentionSuggest.hidden=true;return;}
+    closeComposerPopups('mention');
+    const q=m.query.toLocaleLowerCase('tr-TR');
+    const seen=new Set();
+    const users=Object.values(prunePresence(readPresence()))
+      .filter(u=>u&&u.nick)
+      .filter(u=>{
+        const k=String(u.nick).toLocaleLowerCase('tr-TR');
+        if(seen.has(k))return false; seen.add(k); return true;
+      })
+      .filter(u=>!isBlockedWithV30(u.nick))
+      .filter(u=>!q||String(u.nick).toLocaleLowerCase('tr-TR').includes(q))
+      .slice(0,40);
+    if(!users.length){els.mentionSuggest.hidden=true;return;}
+    els.mentionSuggest.innerHTML=users.map(u=>`<button type="button" data-mention="${escapeHtml(u.nick)}">${avatarHtmlV29(u.nick,true)}<b>${escapeHtml(u.nick)}</b></button>`).join('');
+    els.mentionSuggest.hidden=false;
+  }
+
+  function chooseMention(nick) {
+    const m=currentMentionQuery();
+    if(!m)return;
+    const input=els.messageInput;
+    input.value=input.value.slice(0,m.start)+'@'+nick+' '+input.value.slice(m.end);
+    const pos=m.start+nick.length+2;
+    input.setSelectionRange(pos,pos);
+    input.focus();
+    els.mentionSuggest.hidden=true;
+  }
+
+  function addMessage(type, data = {}) {
+    let list = readMessages();
+    if (data.nick && data.registered === undefined && data.nick === currentNick) data.registered = isRegistered;
+    list.push({id:`m-${Date.now()}-${Math.random().toString(36).slice(2)}`, type, at:Date.now(), time:nowTime(), ...data});
+
+    // 10.000 normal sohbet mesajına ulaşıldığında eski geçmişi tamamen temizle.
+    // Katılma/ayrılma ve bot bildirimleri 10.000 sayacına dahil edilmez.
+    const normalMessageCount = list.reduce((count, item) => count + (item.type === 'chat' ? 1 : 0), 0);
+    if (normalMessageCount >= MAX_MESSAGES) {
+      list = [{
+        id:`m-${Date.now()}-sohbetix-bot-purge`,
+        type:'bot',
+        nick:BOT_NICK,
+        text:BOT_PURGE_TEXT,
+        at:Date.now(),
+        time:nowTime()
+      }];
+    }
+
+    writeMessages(list);
+    if(!activePrivateNick) renderMessages(data.nick === currentNick);
+  }
+
+  function renderMessages(forceBottom = false) {
+    const list = readMessages();
+    const wasNearBottom = isNearMessagesBottom();
+    const previousScrollTop = els.messages.scrollTop;
+    if (!list.length) {
+      els.messages.innerHTML = '<div class="room-empty-v15">Sohbet henüz boş. İlk katılan sen olabilirsin.</div>';
+      return;
+    }
+    els.messages.innerHTML = list.filter(msg=>!msg.nick || !isBlockedWithV30(msg.nick)).map(msg => {
+      const registered = targetRegistrationByNick(msg.nick, msg.registered);
+      if (msg.type === 'join') {
+        const vv=userVisualV29(msg.nick||'');
+        return `<div class="system-message-v15 user-target-v20" data-user-nick="${escapeHtml(msg.nick||'')}" data-user-registered="${registered?'1':'0'}"><button class="system-nick-v15" style="color:${vv.nickColor};font-weight:${vv.boldNick?'900':'800'};text-decoration:${vv.boldNick?'underline':'none'}" type="button">@${escapeHtml(msg.nick)}</button> <span>${cfg.language==='en'?'joined us...':'bize katılıyor...'}</span> <small>${escapeHtml(msg.time || '')}</small></div>`;
+      }
+      if (msg.type === 'leave') {
+        const vv=userVisualV29(msg.nick||'');
+        return `<div class="system-message-v15 leave user-target-v20" data-user-nick="${escapeHtml(msg.nick||'')}" data-user-registered="${registered?'1':'0'}"><button class="system-nick-v15" style="color:${vv.nickColor};font-weight:${vv.boldNick?'900':'800'};text-decoration:${vv.boldNick?'underline':'none'}" type="button">@${escapeHtml(msg.nick)}</button> <span>${cfg.language==='en'?'left us...':'bizi terk ediyor...'}</span> <small>${escapeHtml(msg.time || '')}</small></div>`;
+      }
+      if (msg.type === 'bot') {
+        return `<article class="bot-message-v17"><div class="bot-avatar-v17">S</div><div class="bot-message-body-v17"><div class="bot-message-meta-v17"><b>${escapeHtml(BOT_NICK)}</b><small>${escapeHtml(msg.time || '')}</small></div><p>${escapeHtml(msg.text || BOT_PURGE_TEXT)}</p></div></article>`;
+      }
+      if(msg.type==='image') return `<article class="live-message-v15 user-target-v20" data-user-nick="${escapeHtml(msg.nick||'')}" data-user-registered="${registered?'1':'0'}">${avatarHtmlV29(msg.nick||'')}<div class="live-message-body-v15"><div class="live-message-meta-v15"><b style="color:${userVisualV29(msg.nick||'').nickColor};font-weight:${userVisualV29(msg.nick||'').boldNick?'900':'700'};text-decoration:${userVisualV29(msg.nick||'').boldNick?'underline':'none'}">${escapeHtml(msg.nick||'')}</b><small>${escapeHtml(msg.time||'')}</small></div><img class="live-image-v18" src="${escapeHtml(msg.data||'')}" alt="Paylaşılan resim"></div>${ownMessageCheckboxV29(msg)}</article>`;
+      if(msg.type==='voice') return voiceMessageHtmlV34(msg,cleanNick(msg.nick||''),registered,false);
+      return `<article class="live-message-v15 user-target-v20 ${messageMentionsCurrentV29(msg.text)?'message-mentions-me-v29':''}" data-user-nick="${escapeHtml(msg.nick||'')}" data-user-registered="${registered?'1':'0'}">${avatarHtmlV29(msg.nick||'')}<div class="live-message-body-v15"><div class="live-message-meta-v15"><b style="color:${userVisualV29(msg.nick||'').nickColor};font-weight:${userVisualV29(msg.nick||'').boldNick?'900':'700'};text-decoration:${userVisualV29(msg.nick||'').boldNick?'underline':'none'}">${escapeHtml(msg.nick||'')}</b><small>${escapeHtml(msg.time || '')}</small></div><p style="color:${userVisualV29(msg.nick||'').textColor};font-weight:${userVisualV29(msg.nick||'').boldText?'800':'400'};text-decoration:${userVisualV29(msg.nick||'').boldText?'underline':'none'}">${renderChatText(msg.text||'')}</p></div>${ownMessageCheckboxV29(msg)}</article>`;
+    }).join('');
+    if (forceBottom || wasNearBottom) els.messages.scrollTop = els.messages.scrollHeight;
+    else els.messages.scrollTop = previousScrollTop;
+    updateMessageSelectionMenuV29();
+    requestAnimationFrame(updateLatestMessagesButton);
+    hydrateVoicePlayersV34();
+  }
+
+  function dedupePresenceV29(presence) {
+    const best=new Map();
+    for(const [id,item] of Object.entries(presence||{})){
+      if(!item) continue;
+      const key=cleanNick(item.nick).toLocaleLowerCase('tr-TR');
+      if(!key) continue;
+      const prev=best.get(key);
+      if(!prev){
+        best.set(key,{id,item});
+        continue;
+      }
+      const currentPreferred=id===clientId;
+      const previousPreferred=prev.id===clientId;
+      if(currentPreferred || (!previousPreferred && Number(item.lastSeen||0)>Number(prev.item.lastSeen||0))){
+        best.set(key,{id,item});
+      }
+    }
+    const keep=new Set([...best.values()].map(x=>x.id));
+    for(const id of Object.keys(presence||{})){
+      if(!keep.has(id)) delete presence[id];
+    }
+    return presence;
+  }
+
+  function prunePresence(presence) {
+    const now = Date.now();
+    for (const [id, item] of Object.entries(presence)) {
+      if (!presenceItemActiveV32(item,now)) delete presence[id];
+    }
+    return dedupePresenceV29(presence);
+  }
+
+  function renderPresence() {
+    let presence = sweepExpiredPresence(readPresence());
+    writePresence(presence);
+    const q = (els.search.value || '').toLocaleLowerCase('tr-TR').trim();
+    const seenNicks=new Set();
+    const users=Object.values(presence)
+      .filter(u=>{
+        const key=cleanNick(u?.nick).toLocaleLowerCase('tr-TR');
+        if(!key || seenNicks.has(key)) return false;
+        seenNicks.add(key);
+        return true;
+      })
+      .sort((a,b)=>{
+        const av=userVisualV29(a.nick), bv=userVisualV29(b.nick);
+        if(av.vip!==bv.vip) return av.vip ? -1 : 1;
+        return String(a.nick).localeCompare(String(b.nick),'tr');
+      });
+    els.onlineCount.textContent = cfg.language==='en'?`${users.length} online`:`${users.length} çevrimiçi`;
+    const filtered = users.filter(u => !isBlockedWithV30(u.nick)).filter(u => !q || String(u.nick).toLocaleLowerCase('tr-TR').includes(q));
+    const botMatches = !q || BOT_NICK.toLocaleLowerCase('tr-TR').includes(q);
+    const botRow = botMatches ? `<li class="room-bot-user-v17"><span class="room-mini-avatar-v15 room-bot-avatar-v17">S</span><b>${escapeHtml(BOT_NICK)}</b></li>` : '';
+    els.userList.innerHTML = botRow + filtered.map(u => {const vv=userVisualV29(u.nick);return `<li class="user-target-v20 ${vv.vip?'vip-user-v28':''}" data-user-nick="${escapeHtml(u.nick||'')}" data-user-registered="${normalizeRegisteredFlag(u.registered)?'1':'0'}">${avatarHtmlV29(u.nick,true)}${presenceStatusHtmlV29(u.status)}<b style="color:${vv.nickColor};font-weight:${vv.boldNick?'900':'700'};text-decoration:${vv.boldNick?'underline':'none'}">${escapeHtml(u.nick)}</b>${vv.vip?'<span class="vip-crown-v28">VIP</span>':''}</li>`;}).join('');
+  }
+
+  function heartbeatPresence() {
+    if (!currentNick) return;
+    const presence=sweepExpiredPresence(readPresence());
+    const key=cleanNick(currentNick).toLocaleLowerCase('tr-TR');
+    for(const [id,item] of Object.entries(presence)){
+      if(id!==clientId && item && cleanNick(item.nick).toLocaleLowerCase('tr-TR')===key){
+        delete presence[id];
+      }
+    }
+    presence[clientId]={nick:currentNick,registered:isRegistered,ownerId:AUTH_ID||'',profileId:V.getProfileByNick(currentNick)?.id||'',status:currentStatus,lastSeen:Date.now(),suspended:!!document.hidden,closingAt:0};
+    writePresence(dedupePresenceV29(presence));
+    cleanupEphemeralPrivateV30(presence);
+    renderPresence();
+  }
+
+  function markPresenceLifecycleV32({suspended=false,closing=false}={}){
+    if(!currentNick)return;
+    const presence=readPresence();
+    const item=presence[clientId]||{};
+    presence[clientId]={...item,nick:currentNick,registered:isRegistered,ownerId:AUTH_ID||'',profileId:V.getProfileByNick(currentNick)?.id||'',status:currentStatus,lastSeen:Date.now(),suspended:!!suspended,closingAt:closing?Date.now():0};
+    writePresence(dedupePresenceV29(presence));
+  }
+
+  function startHeartbeat() {
+    clearInterval(heartbeat);
+    heartbeatPresence();
+    heartbeat = setInterval(heartbeatPresence, HEARTBEAT_MS);
+  }
+
+  function removePresence(announce) {
+    if (!currentNick) return;
+    const leavingNick = currentNick;
+    const presence = prunePresence(readPresence());
+    delete presence[clientId];
+    writePresence(presence);
+    if (announce) announcePresenceV31('leave', leavingNick, isRegistered);
+    cleanupEphemeralPrivateV30(presence);
+    renderPresence();
+  }
+
+  function setLoggedInState(on) {
+    els.guestFooter.hidden = on;
+    els.messageForm.hidden = !on;
+    els.roomAccount.hidden = !on;
+    if (els.preJoinBlessing) els.preJoinBlessing.hidden = on;
+    document.body.classList.toggle('room-not-joined-v21', !on);
+    if (els.profileSaveHint) els.profileSaveHint.hidden = !!isRegistered;
+    if (on) {
+      els.roomAccountNick.textContent = currentNick;
+      currentStatus=loadStatusV29(currentNick);
+      updateAccountStatusIconV29();
+      setTimeout(() => els.messageInput.focus(), 50);
+    }
+  }
+
+  function openJoinModal() {
+    if(cfg.disabled)return;
+    els.overlay.hidden = false;
+    els.joinBtn.disabled = true;
+
+    if(isRegistered){
+      els.registeredProfilePanel.hidden = false;
+      els.guestJoinPanel.hidden = true;
+      els.registeredAccountEmail.textContent = AUTH_EMAIL || localStorage.getItem('sohbetix-auth-nick') || 'Sohbetix hesabı';
+      renderProfilesV25();
+      if(readChatProfilesV25().length && profileMode!=='edit' && profileMode!=='new'){
+        profileMode='existing';
+        setProfileEditorV25('existing');
+      }
+    }else{
+      els.registeredProfilePanel.hidden = true;
+      els.guestJoinPanel.hidden = false;
+      els.guestNick.value = '';
+      els.guestNick.placeholder=cfg.language==='en'?'Nickname':'Misafir rumuzu';
+      els.nickCounter.textContent='0/20';
+    }
+
+    updateJoinEnabled();
+    setTimeout(()=>{
+      if(isRegistered && !els.profileEditorV25.hidden) els.profileNickV25.focus();
+      else if(!isRegistered) els.guestNick.focus();
+    },50);
+  }
+
+  function closeJoinModal() { els.overlay.hidden = true; closeProfileMenusV25(); }
+
+  function updateJoinEnabled() {
+    if(isRegistered){
+      const nick=registeredNickCandidateV25();
+      if(els.profileNickCounterV25 && !els.profileEditorV25.hidden){
+        els.profileNickCounterV25.textContent=Array.from(cleanNick(els.profileNickV25.value)).length;
+      }
+      els.joinBtn.disabled=!(nick.length>0);
+      return;
+    }
+    const nick=cleanNick(els.guestNick.value);
+    els.nickCounter.textContent=`${Array.from(nick).length}/20`;
+    els.joinBtn.disabled=!(nick.length>0);
+  }
+
+  function joinRoom() {
+    if(cfg.disabled) return;
+
+    let nick='';
+    if(isRegistered){
+      const saved=saveRegisteredProfileV25();
+      if(!saved.ok){
+        if(saved.error && saved.error!=='limit') toastV20(saved.error);
+        updateJoinEnabled();
+        return;
+      }
+      nick=saved.nick;
+      renderProfilesV25();
+    }else{
+      nick=cleanNick(els.guestNick.value);
+      if(nick && !V.nickAvailable(nick)){
+        toastV20('Bu rumuz kayıtlı bir profile ait. Başka bir rumuz seç.');
+        return;
+      }
+    }
+
+    if(!nick) return;
+    const previousNick=cleanNick(currentNick);
+    if(previousNick && previousNick.toLocaleLowerCase('tr-TR')!==cleanNick(nick).toLocaleLowerCase('tr-TR')){
+      clearInterval(heartbeat);
+      const p=readPresence(); delete p[clientId]; writePresence(p);
+      announcePresenceV31('leave',previousNick,isRegistered);
+    }
+    currentNick = nick;
+    currentStatus=loadStatusV29(currentNick);
+    updateAccountStatusIconV29();
+    if(isRegistered){
+      const prof=V.getProfileByNick(currentNick);
+      if(prof){
+        const pd=V.getProfileDataByProfile(prof);
+        const rooms=Array.isArray(pd.rooms)?pd.rooms:[];
+        if(!rooms.includes(String(cfg.slug||'sohbetix'))) rooms.push(String(cfg.slug||'sohbetix'));
+        V.saveProfileData(prof.id,{...pd,rooms:rooms.slice(-100)});
+      }
+    }
+    sessionStorage.setItem('sohbetix-v30-last-room',String(cfg.slug||'sohbetix'));
+    sessionStorage.setItem(SESSION_NICK, currentNick);
+    sessionStorage.removeItem('sohbetix-v30-open-profile');
+    closeJoinModal();
+    setLoggedInState(true);
+    const beforeJoinPresence=sweepExpiredPresence(readPresence());
+    const alreadyOnline=Object.values(beforeJoinPresence).some(item=>item&&cleanNick(item.nick).toLocaleLowerCase('tr-TR')===cleanNick(currentNick).toLocaleLowerCase('tr-TR')&&presenceItemActiveV32(item));
+    startHeartbeat();
+    sessionStorage.setItem(SESSION_JOIN_FLAG, currentNick);
+    if(!alreadyOnline) announcePresenceV31('join', currentNick, isRegistered);
+    renderPresence();
+  }
+
+  function leaveRoom() {
+    if (!currentNick) return;
+    clearMessageSelectionV29();
+    activePrivateNick='';
+    openedPrivateNicks.clear();
+    renderPrivateTabsV29();
+    clearInterval(heartbeat);
+    removePresence(true);
+    sessionStorage.removeItem(SESSION_NICK);
+    sessionStorage.removeItem(SESSION_JOIN_FLAG);
+    currentNick = '';
+    setLoggedInState(false);
+    els.roomAccountMenu.hidden = true;
+    renderPresence();
+    if(isRegistered) setTimeout(openJoinModal, 60);
+  }
+
+  if (els.accountAuthBtn) els.accountAuthBtn.addEventListener('click', () => {
+    const ret = 'open-chat.html' + (location.search || '');
+    sessionStorage.setItem('sohbetix-auth-entry-v30', String(Date.now()));
+    location.href = 'auth.html?return=' + encodeURIComponent(ret);
+  });
+  if(els.registeredLogoutBtn) els.registeredLogoutBtn.addEventListener('click', logoutRegisteredV25);
+  if(els.profileVipBtnV25) els.profileVipBtnV25.addEventListener('click',()=>{ location.href='vip.html'; });
+  if(els.profileRefreshBtn) els.profileRefreshBtn.addEventListener('click',()=>{ renderProfilesV25(); updateJoinEnabled(); });
+  if(els.newProfileBtnV25) els.newProfileBtnV25.addEventListener('click',beginNewProfileV25);
+  if(els.profileNickV25) els.profileNickV25.addEventListener('input',()=>{ els.profileLimitV25.hidden=true; updateJoinEnabled(); });
+
+  if(els.savedProfilesV25){
+    els.savedProfilesV25.addEventListener('change',e=>{
+      const radio=e.target.closest('input[name="chatProfileV25"]');
+      if(radio) selectExistingProfileV25(radio.value);
+    });
+    els.savedProfilesV25.addEventListener('click',e=>{
+      const more=e.target.closest('[data-profile-more]');
+      if(more){
+        e.stopPropagation();
+        const id=more.dataset.profileMore;
+        const menu=els.savedProfilesV25.querySelector(`[data-profile-menu="${CSS.escape(id)}"]`);
+        const wasOpen=menu && !menu.hidden;
+        closeProfileMenusV25();
+        if(menu) menu.hidden=wasOpen;
+        return;
+      }
+      const edit=e.target.closest('[data-profile-edit]');
+      if(edit){ e.stopPropagation(); closeProfileMenusV25(); beginEditProfileV25(edit.dataset.profileEdit); return; }
+      const del=e.target.closest('[data-profile-delete]');
+      if(del){ e.stopPropagation(); closeProfileMenusV25(); deleteProfileV25(del.dataset.profileDelete); return; }
+    });
+  }
+
+  if(els.mainChatTabV29) els.mainChatTabV29.addEventListener('click',showMainConversationV29);
+  if(els.privateTabsV29) els.privateTabsV29.addEventListener('click',e=>{
+    const close=e.target.closest('[data-private-close]');
+    if(close){ e.stopPropagation(); closePrivateConversationV29(close.dataset.privateClose); return; }
+    const open=e.target.closest('[data-private-open]');
+    if(open){ openPrivateConversationV29(open.dataset.privateOpen); }
+  });
+
+  els.openJoin.addEventListener('click', openJoinModal);
+  els.closeJoin.addEventListener('click', closeJoinModal);
+  els.overlay.addEventListener('click', e => { if (e.target === els.overlay) closeJoinModal(); });
+  els.guestNick.addEventListener('input',()=>{ if(!isRegistered) updateJoinEnabled(); });
+  els.search.addEventListener('input', renderPresence);
+  els.joinBtn.addEventListener('click', joinRoom);
+  els.guestNick.addEventListener('keydown', e => { if (e.key === 'Enter' && !els.joinBtn.disabled) { e.preventDefault(); joinRoom(); } });
+
+  const FLOOD_WINDOW_MS = 10000;
+  const FLOOD_MAX_MESSAGES = 5;
+  const STORAGE_FLOOD_STATE = 'sohbetix-v28-flood-state';
+  let floodTimer = null;
+
+  function normalizeFloodText(v){
+    return String(v||'')
+      .toLocaleLowerCase('tr-TR')
+      .replace(/\s+/g,' ')
+      .replace(/[^\p{L}\p{N}\s]/gu,'')
+      .trim();
+  }
+
+  function floodSimilarity(a,b){
+    a=normalizeFloodText(a); b=normalizeFloodText(b);
+    if(!a || !b) return 0;
+    if(a===b) return 1;
+    const short=a.length<=b.length?a:b, long=a.length>b.length?a:b;
+    if(long.includes(short) && short.length>=2) return short.length/long.length;
+    const aa=new Set(a.split(' ').filter(Boolean)), bb=new Set(b.split(' ').filter(Boolean));
+    if(!aa.size || !bb.size) return 0;
+    let common=0;
+    for(const x of aa) if(bb.has(x)) common++;
+    return common/Math.max(aa.size,bb.size);
+  }
+
+  function readFloodState(){
+    try{
+      const x=JSON.parse(sessionStorage.getItem(STORAGE_FLOOD_STATE)||'{}');
+      return {
+        events:Array.isArray(x.events)?x.events:[],
+        lastText:String(x.lastText||''),
+        blockUntil:Number(x.blockUntil||0)
+      };
+    }catch{
+      return {events:[],lastText:'',blockUntil:0};
+    }
+  }
+
+  function writeFloodState(s){
+    sessionStorage.setItem(STORAGE_FLOOD_STATE,JSON.stringify(s));
+  }
+
+  function hideFloodWarning(){
+    if(els.floodWarning) els.floodWarning.hidden=true;
+    if(els.floodCountdown) els.floodCountdown.textContent='';
+    if(floodTimer){clearInterval(floodTimer);floodTimer=null;}
+  }
+
+  function showFloodWarning(blockUntil){
+    if(!els.floodWarning) return;
+    els.floodWarning.hidden=false;
+    if(floodTimer) clearInterval(floodTimer);
+    const update=()=>{
+      const left=Math.max(0,Number(blockUntil)-Date.now());
+      if(els.floodCountdown){
+        els.floodCountdown.textContent=left>0 ? `Kalan süre: ${Math.ceil(left/1000)} sn` : '';
+      }
+      if(left<=0) hideFloodWarning();
+    };
+    update();
+    floodTimer=setInterval(update,250);
+  }
+
+  function checkFloodBeforeSend(text){
+    if(isVipV25()){
+      hideFloodWarning();
+      return true;
+    }
+    const now=Date.now();
+    const state=readFloodState();
+    state.events=state.events.filter(t=>now-Number(t)<FLOOD_WINDOW_MS);
+
+    if(state.blockUntil>now){
+      writeFloodState(state);
+      showFloodWarning(state.blockUntil);
+      return false;
+    }
+
+    const similar=state.lastText && floodSimilarity(text,state.lastText)>=0.78;
+    const burst=state.events.length>=FLOOD_MAX_MESSAGES;
+
+    if(similar || burst){
+      state.blockUntil=now+FLOOD_WINDOW_MS;
+      writeFloodState(state);
+      showFloodWarning(state.blockUntil);
+      return false;
+    }
+
+    state.events.push(now);
+    state.lastText=String(text||'').slice(0,512);
+    state.blockUntil=0;
+    writeFloodState(state);
+    hideFloodWarning();
+    return true;
+  }
+
+  if(els.floodVipBtn){
+    els.floodVipBtn.addEventListener('click',()=>{
+      location.href='vip.html';
+    });
+  }
+
+  if(els.voiceRecordButtonV34){
+    els.voiceRecordButtonV34.addEventListener('click',()=>{
+      if(voiceRecorderV34&&voiceRecorderV34.state!=='inactive') stopVoiceRecordingV34();
+      else startVoiceRecordingV34();
+    });
+  }
+
+  if(els.chatImageButtonV29 && els.chatImageInputV29){
+    els.chatImageButtonV29.addEventListener('click',()=>{
+      if(!currentNick)return;
+      if(!isVipV25()){alert('Fotoğraf ve GIF paylaşımı yalnızca VIP kullanıcılar içindir.');return;}
+      els.chatImageInputV29.click();
+    });
+    els.chatImageInputV29.addEventListener('change',()=>{
+      const file=els.chatImageInputV29.files?.[0]; if(!file)return;
+      if(file.size>10*1024*1024){alert('Dosya çok büyük. En fazla 10 MB.');els.chatImageInputV29.value='';return;}
+      const reader=new FileReader(); reader.onload=()=>{const data=String(reader.result||'');try{if(activePrivateNick)addPrivateMessageV29(activePrivateNick,{type:'image',data});else addMessage('image',{nick:currentNick,data});}catch(err){alert('Dosya tarayıcı depolama sınırına sığmadı. Daha küçük bir dosya dene.');}els.chatImageInputV29.value='';}; reader.readAsDataURL(file);
+    });
+  }
+
+  els.messageForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const text = els.messageInput.value.trim();
+    if (!currentNick || !text) return;
+    if(containsLinkV32(text)){
+      if(!activePrivateNick){toastV20('Ana sayfada bağlantı paylaşmak yasaktır.');return;}
+      if(!isVipV25()){toastV20('Gizli sohbette bağlantı paylaşımı yalnızca VIP kullanıcılar içindir.');return;}
+    }
+    if (!checkFloodBeforeSend(text)) return;
+    if(activePrivateNick) addPrivateMessageV29(activePrivateNick,{type:'chat',text:text.slice(0,512)});
+    else addMessage('chat', {nick:currentNick, text:text.slice(0,512)});
+    els.messageInput.value = '';
+    els.messageInput.focus();
+    if(els.mentionSuggest) els.mentionSuggest.hidden=true;
+  });
+  els.messageInput.addEventListener('input', renderMentionSuggestions);
+  els.messageInput.addEventListener('click', renderMentionSuggestions);
+  els.messageInput.addEventListener('keyup', e => { if(e.key==='@' || e.key==='ArrowLeft' || e.key==='ArrowRight') renderMentionSuggestions(); });
+  if(els.mentionSuggest) els.mentionSuggest.addEventListener('click',e=>{
+    const b=e.target.closest('[data-mention]'); if(!b)return;
+    e.preventDefault(); chooseMention(b.dataset.mention);
+  });
+  els.messageInput.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeComposerPopups();
+    if (e.key === 'Enter' && !e.shiftKey && (!els.mentionSuggest || els.mentionSuggest.hidden)) { e.preventDefault(); els.messageForm.requestSubmit(); }
+  });
+  els.messageInput.addEventListener('paste', e => {
+    const items=[...(e.clipboardData?.items||[])]; const image=items.find(i=>i.type&&i.type.startsWith('image/')); if(!image)return;
+    e.preventDefault(); if(!isVipV25()){alert(cfg.language==='en'?'Photo/GIF sharing is for VIP users only.':'Fotoğraf ve GIF paylaşımı yalnızca VIP kullanıcılar içindir.');return;}
+    const file=image.getAsFile(); if(!file)return; if(file.size>10*1024*1024){alert(cfg.language==='en'?'File is too large. Maximum 10 MB.':'Dosya çok büyük. En fazla 10 MB.');return;}
+    const reader=new FileReader(); reader.onload=()=>{try{if(activePrivateNick)addPrivateMessageV29(activePrivateNick,{type:'image',data:String(reader.result||'')});else addMessage('image',{nick:currentNick,data:String(reader.result||'')});}catch{alert('Resim kaydedilemedi.');}}; reader.readAsDataURL(file);
+  });
+  els.roomAccountBtn.addEventListener('click', e => { e.stopPropagation(); els.roomAccountMenu.hidden = !els.roomAccountMenu.hidden; updateAccountStatusIconV29(); });
+  if(els.roomAccountMenu){
+    els.roomAccountMenu.addEventListener('click',e=>{
+      e.stopPropagation();
+      const btn=e.target.closest('[data-presence-status]');
+      if(btn){setPresenceStatusV29(btn.dataset.presenceStatus);els.roomAccountMenu.hidden=true;}
+    });
+  }
+  els.leaveBtn.addEventListener('click', leaveRoom);
+  if(els.deleteSelectedMessagesV29) els.deleteSelectedMessagesV29.addEventListener('click',deleteSelectedMessagesV29);
+  if(els.cancelSelectedMessagesV29) els.cancelSelectedMessagesV29.addEventListener('click',clearMessageSelectionV29);
+  document.addEventListener('click', () => { els.roomAccountMenu.hidden = true; });
+  window.addEventListener('storage', e => {
+    if (e.key === STORAGE_MESSAGES && !activePrivateNick) renderMessages();
+    if (e.key === STORAGE_PRESENCE) renderPresence();
+    if (e.key && e.key.startsWith(PRIVATE_STORAGE_PREFIX) && activePrivateNick) renderPrivateMessagesV29();
+    if (e.key && e.key.startsWith(PRIVATE_NOTIFY_PREFIX) && e.newValue){try{showPrivateNotificationV34(JSON.parse(e.newValue));}catch{}}
+    if (e.key && (e.key.startsWith('sohbetix-v30-ignore:') || e.key.startsWith(PRIVATE_META_PREFIX))){closeBlockedPrivateTabsV30();renderPresence();renderActiveConversationV29();}
+  });
+  function reconcilePresenceOnReturnV32(){
+    if(!currentNick)return;
+    const raw=readPresence();
+    const mine=raw[clientId];
+    const key=cleanNick(currentNick).toLocaleLowerCase('tr-TR');
+    const sameNickKnown=Object.values(raw).some(item=>item&&cleanNick(item.nick).toLocaleLowerCase('tr-TR')===key&&presenceItemActiveV32(item));
+    heartbeatPresence();
+    if(!sameNickKnown){sessionStorage.setItem(SESSION_JOIN_FLAG,currentNick);announcePresenceV31('join',currentNick,isRegistered);}
+  }
+  document.addEventListener('visibilitychange',()=>{
+    if(!currentNick)return;
+    if(document.hidden) markPresenceLifecycleV32({suspended:true,closing:false});
+    else reconcilePresenceOnReturnV32();
+  });
+  window.addEventListener('pageshow',()=>setTimeout(reconcilePresenceOnReturnV32,40));
+  window.addEventListener('pagehide',(e)=>{if(!e.persisted)markPresenceLifecycleV32({suspended:false,closing:true});});
+  window.addEventListener('beforeunload',()=>markPresenceLifecycleV32({suspended:false,closing:true}));
+
+  document.title=(cfg.title||'Sohbetix')+(cfg.language==='en'?' Chat':' Sohbet');
+  const titleBtn=document.getElementById('roomTitleBtn'); if(titleBtn) titleBtn.textContent=(cfg.title||'Sohbetix');
+  const tab=document.querySelector('.room-tabs-v15 button'); if(tab)tab.textContent=cfg.language==='en'?'Home':'Ana sayfa';
+  els.search.placeholder=cfg.language==='en'?'Nickname search':'Rumuz ara'; els.openJoin.textContent=cfg.language==='en'?'Enter chat':'Sohbete gir'; els.joinBtn.textContent=cfg.language==='en'?'Enter chat':'Sohbete gir'; els.messageInput.placeholder=cfg.language==='en'?'Write a message...':'Mesajını yaz...';
+  if(cfg.disabled){if(els.disabledNotice){els.disabledNotice.hidden=false;els.disabledNotice.textContent=cfg.language==='en'?'This chat is temporarily disabled.':'Bu sohbet geçici olarak devre dışı bırakıldı.';}els.guestFooter.hidden=true;els.messageForm.hidden=true;}
+  els.userList.addEventListener('click',e=>{const li=e.target.closest('.user-target-v20');if(!li)return;e.stopPropagation();showUserMenu(li.dataset.userNick,li.dataset.userRegistered==='1',li);});
+  els.messages.addEventListener('click',e=>{
+    if(e.target.closest('.own-message-select-v29')) return;
+    const row=e.target.closest('.user-target-v20');if(!row)return;e.stopPropagation();showUserMenu(row.dataset.userNick,row.dataset.userRegistered==='1',row);
+  });
+  els.messages.addEventListener('change',e=>{
+    const box=e.target.closest('.own-message-select-v29'); if(!box || !isRegistered) return;
+    const id=String(box.dataset.messageId||'');
+    if(!id) return;
+    if(box.checked) selectedMessageIdsV29.add(id); else selectedMessageIdsV29.delete(id);
+    updateMessageSelectionMenuV29();
+  });
+  els.messages.addEventListener('scroll',updateLatestMessagesButton,{passive:true});
+  if(els.latestMessagesBtn) els.latestMessagesBtn.addEventListener('click',()=>scrollToLatestMessages(true));
+  document.addEventListener('click',e=>{
+    if(!e.target.closest('.sohbetix-user-menu-v20'))closeUserMenu();
+    if(!e.target.closest('.saved-profile-row-v25'))closeProfileMenusV25();
+    if(!e.target.closest('.emoji-panel-v23') && !e.target.closest('#smileyBtn')) {
+      if(els.emojiPanel) els.emojiPanel.hidden=true;
+    }
+    if(!e.target.closest('.mention-suggest-v23') && !e.target.closest('#messageInput')) {
+      if(els.mentionSuggest) els.mentionSuggest.hidden=true;
+    }
+  });
+  initEmojiPanelV23();
+  renderPrivateTabsV29();
+  renderMessages();
+  renderPresence();
+  if (currentNick) {
+    currentStatus=loadStatusV29(currentNick);
+    updateAccountStatusIconV29();
+    setLoggedInState(true);
+    const preHeartbeatPresence=sweepExpiredPresence(readPresence());
+    const alreadyOnline=Object.values(preHeartbeatPresence).some(item =>
+      item &&
+      cleanNick(item.nick).toLocaleLowerCase('tr-TR')===cleanNick(currentNick).toLocaleLowerCase('tr-TR') &&
+      presenceItemActiveV32(item)
+    );
+    startHeartbeat();
+    sessionStorage.setItem(SESSION_JOIN_FLAG, currentNick);
+    if (!alreadyOnline) announcePresenceV31('join', currentNick, isRegistered);
+    const pendingPrivate=sessionStorage.getItem('sohbetix-v34-open-private')||sessionStorage.getItem('sohbetix-v32-open-private');
+    if(pendingPrivate){sessionStorage.removeItem('sohbetix-v34-open-private');sessionStorage.removeItem('sohbetix-v32-open-private');setTimeout(()=>openPrivateConversationV29(pendingPrivate),80);}
+  } else {
+    setLoggedInState(false);
+    if(isRegistered || sessionStorage.getItem('sohbetix-v30-open-profile')==='1'){
+      setTimeout(openJoinModal, 60);
+    }
+  }
+})();
+
+
+/* V18 mobile viewport fix: keeps header/users/composer fixed and lets only messages scroll. */
+(() => {
+  'use strict';
+  const root = document.documentElement;
+  root.classList.add('room-fixed-viewport');
+
+  let raf = 0;
+  function syncRoomViewport() {
+    cancelAnimationFrame(raf);
+    raf = requestAnimationFrame(() => {
+      const vv = window.visualViewport;
+      const height = vv ? vv.height : window.innerHeight;
+      const top = vv ? vv.offsetTop : 0;
+      root.style.setProperty('--room-viewport-height', `${Math.max(320, Math.round(height))}px`);
+      root.style.setProperty('--room-viewport-top', `${Math.max(0, Math.round(top))}px`);
+    });
+  }
+
+  syncRoomViewport();
+  window.addEventListener('resize', syncRoomViewport, {passive:true});
+  window.addEventListener('orientationchange', syncRoomViewport, {passive:true});
+  if (window.visualViewport) {
+    window.visualViewport.addEventListener('resize', syncRoomViewport, {passive:true});
+    window.visualViewport.addEventListener('scroll', syncRoomViewport, {passive:true});
+  }
+
+  const input = document.getElementById('messageInput');
+  if (input) {
+    input.addEventListener('focus', () => setTimeout(syncRoomViewport, 60));
+    input.addEventListener('blur', () => setTimeout(syncRoomViewport, 60));
+  }
+})();

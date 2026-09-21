@@ -1,0 +1,2358 @@
+
+:root{
+  --bg:#f6f8fb;
+  --surface:#ffffff;
+  --surface-2:#f1f5f9;
+  --surface-3:#eaf0f6;
+  --text:#172033;
+  --muted:#6b7280;
+  --line:#dfe6ee;
+  --brand:#8b0000;
+  --brand-2:#b11226;
+  --blue:#2185d0;
+  --blue-2:#4aa8ea;
+  --green:#22a06b;
+  --danger:#d84b4b;
+  --gold:#f3b434;
+  --shadow:0 10px 30px rgba(15,23,42,.08);
+  --shadow-lg:0 20px 60px rgba(15,23,42,.14);
+  --r:16px;
+  --r-sm:10px;
+  --max:1120px;
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth;overflow-x:hidden}
+body{
+  margin:0;
+  font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif;
+  color:var(--text);
+  background:var(--bg);
+  font-size:14px;
+  line-height:1.45;
+  overflow-x:hidden;
+}
+button,input,select,textarea{font:inherit}
+button,a{touch-action:manipulation}
+a{color:var(--blue);text-decoration:none}
+a:hover{text-decoration:none}
+img,svg{max-width:100%}
+[hidden]{display:none!important}
+
+.wrap,.admin-wrap,.dash-wrap,.control-wrap{
+  width:min(var(--max),calc(100% - 40px));
+  margin-inline:auto;
+}
+
+/* ===== Header ===== */
+.topbar,.admin-top,.dash-top,.control-topbar{
+  position:sticky;
+  top:0;
+  z-index:100;
+  height:64px;
+  background:rgba(255,255,255,.92);
+  border-bottom:1px solid rgba(223,230,238,.95);
+  backdrop-filter:blur(14px);
+}
+.nav,.admin-nav,.dash-nav,.control-nav{
+  min-height:64px;
+  display:flex;
+  align-items:center;
+  gap:10px;
+}
+.brand{
+  font-size:22px;
+  line-height:1;
+  font-weight:800;
+  font-style:italic;
+  color:#151922;
+  letter-spacing:-.5px;
+  white-space:nowrap;
+  margin-right:10px;
+}
+.brand span{color:var(--brand)}
+.nav nav{display:flex;align-items:center;gap:4px;flex:1}
+.nav nav>a,.more-btn,.control,
+.admin-nav-link,.dash-tab,.control-tab{
+  color:#5d6676;
+  font-size:12px;
+  font-weight:700;
+  letter-spacing:.02em;
+  padding:10px 12px;
+  border-radius:9px;
+  border:0;
+  background:transparent;
+  transition:.18s ease;
+}
+.nav nav>a:hover,.more-btn:hover,.admin-nav-link:hover,.dash-tab:hover,.control-tab:hover{
+  color:#111827;background:#f1f5f9
+}
+.control{
+  color:var(--brand);
+  margin-left:auto;
+  border:1px solid #ffd5c6;
+  background:#fff7f3;
+}
+.control:hover{background:#ffede5}
+.more-nav{position:relative}
+.more-menu{
+  position:absolute;
+  top:44px;
+  left:0;
+  min-width:190px;
+  padding:7px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow:var(--shadow-lg);
+  z-index:150;
+}
+.more-menu a{
+  display:block!important;
+  color:#485164!important;
+  padding:10px 11px!important;
+  border-radius:8px;
+  font-size:12px;
+  font-weight:650;
+}
+.more-menu a:hover{background:#f3f6f9!important;color:#111827!important}
+
+/* ===== Buttons / inputs ===== */
+.btn,.green,.blue-btn,.light-btn,.submit-auth,.auth-main-btn,.admin-save,
+.domain-save,.search-btn,.enter-chat-btn,.open-private,.gift-btn,
+.catalog-filter-btn,.english-only,.catalog-search-btn,.create-chat-btn,
+.widget-btn,.users-tab-active,.delete-users{
+  border:0;
+  border-radius:10px;
+  font-weight:750;
+  transition:transform .16s ease, box-shadow .16s ease, background .16s ease;
+}
+.btn:hover,.blue-btn:hover,.submit-auth:hover,.auth-main-btn:hover,.admin-save:hover,
+.domain-save:hover,.search-btn:hover,.open-private:hover,.gift-btn:hover,
+.catalog-search-btn:hover{transform:translateY(-1px)}
+.green,.submit-auth,.auth-main-btn.register,.enter-chat-btn,.search-btn{
+  background:linear-gradient(135deg,#18a66f,#2fbd83);
+  color:white;
+  box-shadow:0 7px 20px rgba(34,160,107,.18);
+}
+.blue-btn,.admin-save,.domain-save,.open-private,.catalog-search-btn,.widget-btn,.users-tab-active{
+  background:linear-gradient(135deg,#2185d0,#4aa8ea);
+  color:#fff;
+  box-shadow:0 7px 20px rgba(33,133,208,.18);
+}
+.auth-main-btn.login{background:linear-gradient(135deg,#2185d0,#4aa8ea);color:#fff}
+.light-btn,.gift-btn,.catalog-filter-btn,.english-only,.create-chat-btn{
+  background:#fff;color:#354052;border:1px solid var(--line)
+}
+input,select,textarea{
+  border:1px solid #d8e0e8;
+  background:#fff;
+  color:var(--text);
+  border-radius:9px;
+  outline:none;
+  transition:border-color .18s ease,box-shadow .18s ease;
+}
+input:focus,select:focus,textarea:focus{
+  border-color:#80bff0;
+  box-shadow:0 0 0 4px rgba(33,133,208,.1);
+}
+
+/* ===== Home ===== */
+.hero{
+  background:
+    radial-gradient(circle at 85% 20%,rgba(255,90,31,.12),transparent 34%),
+    radial-gradient(circle at 10% 70%,rgba(33,133,208,.10),transparent 30%),
+    linear-gradient(135deg,#f8fafc,#eef4f9);
+  padding:76px 0 82px;
+  border-bottom:1px solid var(--line);
+}
+.hero .wrap{max-width:960px}
+.hero h1{
+  margin:0;
+  font-size:64px;
+  line-height:1;
+  letter-spacing:-2px;
+  color:var(--brand);
+  font-weight:850;
+}
+.hero p{
+  max-width:760px;
+  margin:18px 0 24px;
+  font-size:20px;
+  color:#4e596b;
+  line-height:1.55;
+}
+.hero .btn{display:inline-flex;padding:14px 20px;font-size:15px}
+
+.advantages{padding:62px 0 34px}
+.advantages h2,.how h2{
+  font-size:28px;
+  letter-spacing:-.5px;
+  margin:0 0 28px;
+}
+.feature-grid{
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  gap:16px;
+}
+.feature-grid article{
+  display:grid;
+  grid-template-columns:52px minmax(0,1fr);
+  gap:14px;
+  padding:18px;
+  min-height:128px;
+  background:var(--surface);
+  border:1px solid var(--line);
+  border-radius:var(--r);
+  box-shadow:0 4px 16px rgba(15,23,42,.04);
+}
+.ico{
+  width:52px;height:52px;border-radius:14px;
+  display:grid;place-items:center;
+  background:linear-gradient(135deg,#fff7f3,#f0f6ff);
+  font-size:30px;
+}
+.feature-grid h3{margin:3px 0 6px;font-size:15px}
+.feature-grid p{margin:0;color:var(--muted);font-size:12px;line-height:1.55}
+
+/* ===== Chat demo ===== */
+.demo-wrap{padding:24px 0 12px}
+.chatbox{
+  overflow:visible;
+  border:1px solid #cfdae6;
+  background:#fff;
+  border-radius:16px;
+  box-shadow:var(--shadow);
+}
+.chat-title,.profile-bluebar,.openchat-top{
+  min-height:40px;
+  padding:10px 14px;
+  color:#fff;
+  background:linear-gradient(135deg,#268ec8,#48a9dc);
+  font-weight:800;
+}
+.chat-title{border-radius:16px 16px 0 0}
+.chat-layout{display:grid;grid-template-columns:minmax(0,1fr) 170px}
+.chat-main{min-width:0}
+.tabs{
+  padding:8px;
+  background:#f7f9fb;
+  border-bottom:1px solid var(--line);
+  display:flex;gap:6px
+}
+.tab{
+  padding:8px 14px;
+  border:0;border-radius:9px;
+  background:#eef2f6;color:#465164;
+  font-weight:700;
+}
+.tab.active{background:#278bc7;color:#fff}
+.messages{height:310px;overflow-y:auto;padding:14px}
+.message{display:flex;gap:10px;margin-bottom:14px}
+.avatar{width:36px;height:36px;border-radius:10px;display:grid;place-items:center;flex:0 0 36px}
+.avatar.gold,.mini-avatar.gold{background:linear-gradient(135deg,#ffd56c,#eaa90c)}
+.avatar-inner{width:30px;height:30px;background:#fff;border-radius:8px;display:grid;place-items:center}
+.message small{color:#8a94a4;font-size:10px}
+.message p{margin:3px 0 0;font-size:13px}
+.red{color:#d52b2b}.blue{color:#2451c8}.pink{color:#ee5d87}
+.users{
+  border-left:1px solid var(--line);
+  background:#fbfcfd;
+  border-radius:0 0 16px 0;
+}
+.online-count{
+  padding:10px 12px;
+  font-size:11px;color:#637083;
+  border-bottom:1px solid var(--line);
+}
+.users ul{list-style:none;margin:0;padding:7px}
+.users li{display:flex;align-items:center;gap:6px;padding:7px 5px;border-radius:8px;font-size:12px}
+.users li:hover{background:#eef4f8}
+.mini-avatar{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:6px;font-size:12px}
+.crown{color:#a96e00}
+.locked-composer{
+  min-height:46px;padding:10px 13px;
+  background:#f5f7f9;
+  border-top:1px solid var(--line);
+  color:#7a8595;
+  display:flex;align-items:center;gap:8px;
+  border-radius:0 0 0 16px;
+}
+.user-popover{
+  position:fixed;
+  width:180px;
+  background:#fff;
+  border:1px solid var(--line);
+  border-radius:12px;
+  box-shadow:var(--shadow-lg);
+  z-index:300;
+  overflow:hidden;
+}
+.popover-head{padding:9px 10px;border-bottom:1px solid var(--line);display:flex;align-items:center;gap:6px}
+.popover-body{display:grid;grid-template-columns:64px 1fr;gap:8px;padding:9px}
+.popover-photo{width:64px;height:64px;border-radius:12px;background:linear-gradient(135deg,#ffd56c,#dfa20e);display:grid;place-items:center;font-size:40px}
+.popover-actions button{display:block;width:100%;padding:5px 4px;border:0;background:transparent;text-align:left;border-radius:7px;font-size:11px}
+.popover-actions button:hover{background:#f1f5f9}
+
+/* ===== Modals ===== */
+.profile-modal,.users-modal{
+  position:fixed;inset:0;
+  background:rgba(15,23,42,.42);
+  backdrop-filter:blur(8px);
+  z-index:500;
+  display:grid;place-items:center;
+  padding:18px;
+}
+.profile-window,.users-window{
+  width:min(760px,96vw);
+  max-height:92vh;
+  background:#fff;
+  border:1px solid #cbd8e5;
+  border-radius:18px;
+  box-shadow:var(--shadow-lg);
+  overflow:hidden;
+  display:flex;flex-direction:column;
+}
+.profile-window-top{
+  min-height:44px;padding:10px 13px;
+  background:#f2f6fa;border-bottom:1px solid var(--line);
+  display:flex;align-items:center;justify-content:space-between;
+  font-weight:750;
+}
+.profile-window-top button{border:0;background:transparent;font-size:24px;line-height:1;cursor:pointer}
+.profile-address{padding:8px 13px;color:#7a8594;border-bottom:1px solid var(--line);font-size:11px}
+.profile-content{display:grid;grid-template-columns:150px 1fr;min-height:420px}
+.profile-sidebar{padding:16px;background:#f7f9fb;border-right:1px solid var(--line)}
+.enter-chat-btn{width:100%;padding:10px;margin-bottom:24px}
+.users-link{border:0;background:transparent;color:var(--blue);cursor:pointer}
+.profile-main{display:grid;grid-template-columns:180px 1fr;gap:18px;padding:18px}
+.profile-picture{
+  width:180px;height:180px;border-radius:18px;
+  display:grid;place-items:center;
+  font-size:110px;background:linear-gradient(135deg,#ffe38d,#dfa013);
+}
+.profile-info{font-size:12px;line-height:1.5}
+.profile-name-line{font-size:13px;margin-bottom:5px}
+.vip-badge,.online-badge{
+  display:inline-block;padding:3px 6px;border-radius:6px;color:#fff;font-size:9px;font-weight:800;margin-left:4px
+}
+.vip-badge{background:#e6a129}.online-badge{background:#2aa96f}
+.admin-text{color:#d43434;font-weight:800;margin:10px 0}
+.open-private{padding:8px 11px;margin:4px 0 16px}
+.about-title{color:#8691a0;margin-bottom:4px;font-size:13px}
+.gift-wrap{position:relative;display:inline-block;margin-top:18px}
+.gift-btn{padding:8px 11px}
+.gift-menu{
+  position:absolute;top:40px;left:0;width:150px;
+  padding:7px;background:#fff;border:1px solid var(--line);
+  border-radius:10px;box-shadow:var(--shadow)
+}
+.gift-menu button{display:block;width:100%;border:0;background:#fff;padding:8px 10px;text-align:left;border-radius:7px}
+.gift-menu button:hover{background:#f2f5f8}
+.profile-footer{padding:9px 12px;background:#f5f7f9;border-top:1px solid var(--line);display:flex;justify-content:space-between;font-size:10px}
+
+.users-content{display:grid;grid-template-columns:155px 1fr;min-height:500px}
+.users-sidebar-panel{padding:14px;background:#f7f9fb;border-right:1px solid var(--line);font-size:11px}
+.users-sidebar-panel label{display:block;margin:10px 0 4px;font-weight:700}
+.users-sidebar-panel select,.users-sidebar-panel input[type=text]{width:100%;height:34px;padding:0 8px}
+.age-row{display:flex;align-items:center;gap:5px}.age-row input{width:45%;height:34px;padding:0 5px}
+.check{font-weight:500!important;margin:6px 0!important}
+.users-tab-active{width:100%;padding:9px;margin-bottom:8px}
+.search-btn{padding:8px 12px;margin-top:8px}
+.members-panel{padding:14px;overflow-y:auto}
+.members-list{display:flex;flex-direction:column;gap:10px}
+.member-card{
+  display:grid;grid-template-columns:84px 1fr;gap:12px;align-items:start;
+  padding:10px;border:1px solid var(--line);border-radius:12px;background:#fff
+}
+.member-photo{width:84px;height:84px;border-radius:12px;background:#eef2f6;display:grid;place-items:center;font-size:42px}
+.member-card a{font-weight:750;padding-top:3px}
+
+/* ===== How / social / footer ===== */
+.how{padding:34px 0 56px}
+.how ol{padding-left:22px;color:#536074;line-height:1.7}
+.socials{display:flex;gap:8px;flex-wrap:wrap;margin-top:22px}
+.social{display:inline-flex;align-items:center;gap:7px;padding:9px 13px;border-radius:999px;font-size:12px;font-weight:750}
+.social.x{background:#111;color:#fff}
+.social.fb{background:#1877f2;color:#fff}
+.social.tg{background:#2aabee;color:#fff}
+footer,.admin-footer,.dash-footer,.control-footer{
+  margin-top:auto;
+  background:#edf2f6;
+  border-top:1px solid var(--line);
+  padding:18px 0 22px;
+}
+.footer-inner{display:flex;justify-content:space-between;gap:20px;font-size:11px;color:#627083}
+.footer-inner select{height:32px;padding:0 8px}
+
+/* ===== Legal / public ===== */
+.legal,.public-content{padding:38px 0 58px}
+.legal h1,.public-content h1{font-size:26px;letter-spacing:-.4px}
+.legal h3{margin-top:22px}
+.legal p,.public-content p{color:#4f5d70;line-height:1.65}
+.public-main{flex:1}
+.public-page{min-height:100vh;display:flex;flex-direction:column}
+.info-blue,.account-box{
+  border-radius:14px;
+  border:1px solid #cbe3f3;
+  background:#eaf6fd;
+  padding:15px;
+}
+.account-box.warn{background:#fff8e8;border-color:#f2dfad}
+.account-box.green{background:#ecf9e7;border-color:#cce7bf}
+.coins-layout{display:grid;grid-template-columns:170px 1fr;gap:22px}
+.coins-menu a{display:block;padding:9px 5px;border-radius:8px}
+.coins-menu a:hover{background:#edf3f8}
+.account-layout{display:grid;grid-template-columns:1fr 330px;gap:32px}
+.account-row{display:grid;grid-template-columns:150px 1fr;gap:12px;align-items:center;margin:14px 0}
+.account-row label{text-align:right;font-weight:750}
+.account-actions{margin-left:162px;display:flex;gap:7px}
+
+/* ===== Help ===== */
+.help-page{min-height:100vh;background:linear-gradient(135deg,#e9eef3,#dfe6ec);padding:26px 0}
+.help-card{
+  width:min(760px,calc(100% - 32px));margin:0 auto 12px;padding:22px;
+  background:#fff;border:1px solid var(--line);border-radius:16px;box-shadow:var(--shadow)
+}
+.help-card h1{font-size:24px;margin:0 0 16px}
+.help-topic-row{display:flex;gap:12px;flex-wrap:wrap}
+.help-topic{
+  min-width:150px;height:82px;display:grid;place-items:center;
+  border:1px solid var(--line);background:#f7f9fb;border-radius:12px;
+  color:#263244;font-weight:750
+}
+.help-topic:hover{background:#edf4f9}
+.help-footer{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:18px;padding-top:14px;border-top:1px solid var(--line)}
+.lang-links{display:flex;gap:5px;flex-wrap:wrap}
+.lang-links a{color:#465267}.lang-links a.active{background:#4d62d6;color:#fff;padding:1px 4px;border-radius:4px}
+
+/* ===== Auth / control ===== */
+.control-page,.dashboard-page,.admin-page,.catalog-page,.openchat-page{
+  min-height:100vh;display:flex;flex-direction:column;background:var(--bg)
+}
+.control-main{flex:1;display:grid;place-items:center;padding:48px 20px}
+.signin-card{
+  width:min(430px,100%);
+  background:#fff;border:1px solid var(--line);border-radius:22px;
+  box-shadow:var(--shadow-lg);padding:26px;text-align:center
+}
+.signin-card h1{
+  margin:0 0 18px;font-size:22px;color:#152033;
+  background:none;padding:0
+}
+.fast-login-box{padding:18px;background:#f7f9fb;border:1px solid var(--line);border-radius:14px;margin-bottom:16px}
+.fast-title{font-size:16px;font-weight:750;margin-bottom:12px}
+.oauth-row{display:flex;justify-content:center;gap:8px}
+.oauth-btn{width:40px;height:40px;border:1px solid var(--line);border-radius:10px;background:#fff;font-weight:850}
+.auth-actions{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:12px}
+.auth-main-btn{padding:11px}
+.auth-panel{padding:16px;text-align:left;background:#f9fbfc;border:1px solid var(--line);border-radius:14px}
+.auth-panel h2{margin:0 0 12px}
+.auth-panel label{display:block;margin:9px 0 4px;font-size:12px;font-weight:700}
+.auth-panel input{width:100%;height:38px;padding:0 10px}
+.submit-auth{margin-top:12px;padding:10px 14px}
+.demo-note{font-size:10px;color:#8a95a4}
+
+/* ===== Dashboard ===== */
+.admin-nav-link.active,.dash-tab.active,.control-tab.active{
+  background:#eef4f8;color:#172033
+}
+.admin-nav-link.disabled,.dash-tab.coins-disabled,.control-tab.disabled{opacity:.55}
+.admin-user,.dash-account{margin-left:auto;color:#5f6a7a;font-size:12px}
+.dash-main{display:grid;grid-template-columns:minmax(0,1fr) 250px;gap:22px;padding:28px 0;flex:1}
+.chat-select{
+  padding:14px 16px;border:1px solid var(--line);border-radius:14px;background:#fff;
+  display:flex;align-items:center;box-shadow:0 3px 12px rgba(15,23,42,.03)
+}
+.chat-select>button{margin-left:7px}
+.plan-box{margin-left:auto;text-align:right}.free{color:var(--blue)}.pro{color:var(--brand)}
+.dash-grid{display:grid;grid-template-columns:170px minmax(0,1fr);gap:18px;margin-top:18px}
+.dash-menu{display:flex;flex-direction:column;gap:5px}
+.dash-menu button{
+  border:0;background:transparent;text-align:left;padding:10px 11px;border-radius:9px;color:#4b5668;font-weight:650
+}
+.dash-menu button:hover{background:#eaf1f6}
+.stats-card{background:#fff;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.stats-head{display:flex;justify-content:space-between;padding:14px;border-bottom:1px solid var(--line)}
+.online-text{color:var(--blue);font-weight:750}
+.chart-box{height:210px;position:relative;padding:10px}
+.chart-box svg{width:100%;height:170px}
+.chart-y{position:absolute;right:8px;top:15px;bottom:32px;display:flex;flex-direction:column;justify-content:space-between;font-size:10px;color:#8190a0}
+.chart-x{display:flex;justify-content:space-around;font-size:10px;color:#8190a0}
+.create-chat-btn{width:100%;padding:13px 15px;text-align:left;margin-top:18px}
+.side-box{background:#fff;border:1px solid var(--line);border-radius:14px;overflow:hidden;margin-bottom:14px}
+.side-box a,.side-title,.referral{display:block;padding:11px 13px;border-bottom:1px solid var(--line);color:#536074}
+.side-box a:last-child{border-bottom:0}
+
+/* ===== Admin ===== */
+.admin-main{flex:1;padding:28px 0 48px}
+.admin-breadcrumb{display:flex;align-items:center;gap:8px;margin-bottom:18px;flex-wrap:wrap}
+.admin-breadcrumb .root{font-size:22px;color:var(--brand);font-weight:800}
+.admin-open-chat{margin-left:auto;padding:9px 12px;background:#fff;border:1px solid var(--line);border-radius:9px;color:#435066}
+.admin-tabs{display:flex;gap:4px;border-bottom:1px solid var(--line);margin-bottom:20px}
+.admin-tab{padding:10px 12px;border-radius:9px 9px 0 0;color:#4f5d70}
+.admin-tab.active{background:#fff;border:1px solid var(--line);border-bottom:1px solid #fff;position:relative;top:1px;color:#172033;font-weight:750}
+.admin-form,.room-settings{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px}
+.admin-row{display:grid;grid-template-columns:230px minmax(0,1fr);gap:14px;align-items:center;margin:10px 0}
+.admin-row label:first-child{text-align:right;font-weight:700}
+.admin-row input,.admin-row select,.admin-row textarea{width:100%;padding:9px 10px}
+.admin-row textarea{min-height:90px}
+.admin-check{display:block;margin:8px 0 8px 244px}
+.admin-section-title{font-size:18px;margin:28px 0 12px 244px}
+.admin-save{margin:14px 0 0 244px;padding:10px 14px}
+.pro-badge,.warn-badge{display:inline-block;padding:2px 5px;border-radius:5px;background:#eca437;color:#fff;font-size:9px;font-weight:850}
+.design-textarea{width:100%;min-height:180px;padding:12px}
+.design-checkbox{display:block;margin:14px 0}
+.smiley-title{font-size:20px;margin:6px 0 14px}
+.toggle-row{display:flex;align-items:center;gap:18px;margin:12px 0}
+.switch{display:flex;width:92px;height:30px;border:1px solid var(--line);border-radius:9px;overflow:hidden}
+.switch span{flex:1;display:grid;place-items:center}.switch .on{background:var(--blue);color:#fff}.switch.off .off{background:#fff}.switch.off .on{background:#e9eef3}
+.admin-users-head{display:flex;justify-content:space-between;gap:12px;margin-bottom:10px}
+.user-filter{height:38px;padding:0 10px}
+.delete-users{padding:9px 12px;background:#d9534f;color:#fff}
+.users-table{width:100%;border-collapse:collapse;background:#fff}
+.users-table th,.users-table td{padding:10px;border-bottom:1px solid var(--line);text-align:left}
+.empty-users{padding:30px;background:#fff;border:1px dashed #cfd9e3;border-radius:12px;text-align:center;color:#7b8797}
+.rooms-layout{display:grid;grid-template-columns:220px 1fr;gap:18px}
+.room-list{background:#fff;border:1px solid var(--line);border-radius:14px;padding:8px;height:max-content}
+.room-item,.new-room{display:block;padding:10px;border-radius:9px}.room-item{background:#eef4f8;font-weight:750}.new-room{color:#536074}
+.room-settings .admin-row{grid-template-columns:1fr}.room-settings .admin-row label:first-child{text-align:left}
+.room-settings .admin-check,.room-settings .admin-section-title,.room-settings .admin-save{margin-left:0}
+.domain-grid,.own-domain{background:#fff;border:1px solid var(--line);border-radius:16px;padding:20px;margin-bottom:18px}
+.domain-line{display:flex;align-items:center;gap:0;margin:10px 0}.domain-label{width:170px;text-align:right;font-weight:700;margin-right:12px}
+.domain-prefix,.domain-suffix{padding:9px 10px;background:#eef2f6;border:1px solid var(--line);color:#7a8595}
+.domain-line input{height:38px;padding:0 10px;border-radius:0}
+.domain-save{padding:10px 14px;margin-left:182px}
+.own-domain h2{font-size:20px}
+
+/* ===== Catalog ===== */
+.catalog-main{flex:1}
+.catalog-wrap{width:min(var(--max),calc(100% - 40px));margin:auto;padding:28px 0}
+.catalog-toolbar{display:flex;justify-content:space-between;gap:14px;margin-bottom:16px}
+.catalog-left{position:relative;display:flex;gap:7px}
+.catalog-filter-btn,.english-only,.catalog-search-btn{height:36px;padding:0 11px}
+.catalog-search{display:flex}.catalog-search input{width:220px;height:36px;padding:0 10px;border-radius:9px 0 0 9px}.catalog-search-btn{border-radius:0 9px 9px 0}
+.catalog-category-menu{
+  position:absolute;top:43px;left:0;width:190px;padding:7px;background:#fff;border:1px solid var(--line);
+  border-radius:12px;box-shadow:var(--shadow-lg);z-index:100
+}
+.catalog-category-menu button{display:block;width:100%;padding:8px 10px;border:0;background:#fff;text-align:left;border-radius:7px}
+.catalog-category-menu button:hover,.catalog-category-menu button.selected{background:#eaf3fa;color:#1d6fa6}
+.catalog-results-head,.catalog-row{display:grid;grid-template-columns:minmax(0,1fr) 120px 130px}
+.catalog-results-head{padding:10px 12px;font-weight:800;color:#3e495a;border-bottom:1px solid var(--line)}
+.catalog-row{padding:12px;background:#fff;border-bottom:1px solid var(--line)}
+.catalog-row:first-of-type{border-radius:12px 12px 0 0}
+.catalog-row a{font-weight:800}.catalog-row p{margin:3px 0 0;color:#697586;font-size:12px}
+.catalog-empty{padding:36px;border:1px dashed #cfd9e4;background:#fff;border-radius:14px;text-align:center;color:#7d8997}
+.catalog-pagination{display:flex;justify-content:center;gap:4px;margin-top:18px}.catalog-pagination button{border:1px solid var(--line);background:#fff;border-radius:7px;padding:6px 9px}.catalog-pagination .active{background:#eaf3fa}
+
+/* ===== Open chat ===== */
+.openchat-page{background:#f4f6f8}
+.openchat-top{border-radius:0}
+.openchat-body{display:grid;grid-template-columns:minmax(0,1fr) 180px;flex:1;background:#fff}
+.openchat-main{display:flex;flex-direction:column}
+.openchat-tabs{padding:8px;background:#f7f9fb;border-bottom:1px solid var(--line)}
+.openchat-tabs button{border:0;padding:8px 12px;border-radius:8px;background:#258bc7;color:#fff}
+.openchat-empty{flex:1}
+.openchat-enter{padding:8px;background:#f3f6f8;border-top:1px solid var(--line)}
+.openchat-users{border-left:1px solid var(--line);background:#fbfcfd}.openchat-search{padding:8px}.openchat-search input{width:100%;height:34px;padding:0 8px}
+
+/* ===== Mobile ===== */
+.mobile-menu-btn,.mobile-nav-panel{display:none}
+@media(max-width:900px){
+  .feature-grid{grid-template-columns:repeat(2,minmax(0,1fr))}
+  .dash-main{grid-template-columns:1fr}
+  .dash-right{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+  .dash-grid{grid-template-columns:150px minmax(0,1fr)}
+  .account-layout{grid-template-columns:1fr}
+  .rooms-layout{grid-template-columns:1fr}
+}
+@media(max-width:760px){
+  body{font-size:14px}
+  .wrap,.admin-wrap,.dash-wrap,.control-wrap,.catalog-wrap{width:100%;padding-left:18px;padding-right:18px}
+  .topbar,.admin-top,.dash-top,.control-topbar{height:72px}
+  .nav,.admin-nav,.dash-nav,.control-nav{min-height:72px}
+  .brand{font-size:24px}
+  .nav>nav,.nav>.control{display:none!important}
+  .mobile-menu-btn{
+    display:flex;margin-left:auto;width:56px;height:46px;border:1px solid var(--line);border-radius:12px;
+    background:#f7f9fb;flex-direction:column;align-items:center;justify-content:center;gap:5px
+  }
+  .mobile-menu-btn span{width:26px;height:3px;background:#a5afbb;border-radius:4px}
+  .mobile-nav-panel{
+    display:block;position:fixed;top:72px;left:0;right:0;z-index:99;background:#fff;
+    border-bottom:1px solid var(--line);box-shadow:0 12px 26px rgba(15,23,42,.08);max-height:calc(100vh - 72px);overflow:auto
+  }
+  .mobile-nav-panel>a,.mobile-nav-panel>button{
+    display:block;width:100%;padding:18px;border:0;border-bottom:1px solid #eef2f5;background:#fff;text-align:left;color:#566173;font-size:15px;font-weight:650
+  }
+  .mobile-more-menu a{display:block;padding:14px 32px;border-bottom:1px solid #eef2f5;color:#687486}
+  .mobile-control-link{color:var(--brand)!important}
+  .hero{padding:52px 0 58px}.hero .wrap{text-align:center}.hero h1{font-size:48px}.hero p{font-size:18px}.hero .btn{font-size:14px}
+  .advantages{padding:42px 18px 14px}.advantages h2{font-size:28px}.feature-grid{grid-template-columns:1fr}.feature-grid article{min-height:auto}
+  .chatbox{border-radius:14px}.chat-layout{grid-template-columns:minmax(0,1fr) 34%}.chat-title{border-radius:14px 14px 0 0}.users{border-radius:0 0 14px 0}
+  .users li{font-size:11px;padding:6px 2px}.messages{height:420px;padding:10px}.message p{font-size:12px}
+  .profile-window,.users-window{width:calc(100vw - 16px);max-height:calc(100vh - 16px)}
+  .profile-content{grid-template-columns:100px 1fr}.profile-main{grid-template-columns:110px 1fr;padding:12px;gap:10px}.profile-picture{width:110px;height:110px;font-size:66px}.profile-sidebar{padding:10px}
+  .users-content{grid-template-columns:115px 1fr}.member-card{grid-template-columns:70px 1fr}.member-photo{width:70px;height:70px}
+  .how{padding:28px 18px 42px}.how h2{font-size:28px}.socials{gap:7px}
+  .footer-inner{flex-wrap:wrap}
+  .signin-card{border-radius:18px;padding:20px}
+  .dash-nav .dash-tab,.admin-nav .admin-nav-link,.control-nav .control-tab{display:none}.dash-account,.admin-user{display:none}
+  .dash-main{padding:18px}.dash-grid{grid-template-columns:1fr}.dash-menu{display:grid;grid-template-columns:1fr 1fr}.dash-right{display:block}
+  .admin-main{padding:18px 0 36px}.admin-open-chat{margin-left:0}
+  .admin-row{grid-template-columns:1fr}.admin-row label:first-child{text-align:left}.admin-check,.admin-section-title,.admin-save{margin-left:0}
+  .domain-label{width:120px}.domain-save{margin-left:132px}
+  .catalog-toolbar{display:block}.catalog-left{margin-bottom:10px;flex-wrap:wrap}.catalog-search{width:100%}.catalog-search input{flex:1;width:auto}.catalog-results-head,.catalog-row{grid-template-columns:minmax(0,1fr) 60px 70px}.catalog-row{padding:10px 6px}.catalog-results-head{padding:8px 6px;font-size:11px}
+  .coins-layout{grid-template-columns:1fr}.account-row{grid-template-columns:1fr}.account-row label{text-align:left}.account-actions{margin-left:0}
+  .help-card{border-radius:12px}.help-topic{flex:1 1 140px}
+  .openchat-body{grid-template-columns:minmax(0,1fr) 120px}
+}
+@media(max-width:430px){
+  .hero h1{font-size:42px}.hero p{font-size:16px}
+  .feature-grid article{grid-template-columns:46px 1fr;padding:14px}.ico{width:46px;height:46px;font-size:26px}
+  .chat-layout{grid-template-columns:minmax(0,1fr) 32%}.users li{font-size:10px}.mini-avatar{width:18px;height:18px}
+  .profile-content{grid-template-columns:82px 1fr}.profile-main{grid-template-columns:82px 1fr}.profile-picture{width:82px;height:82px;font-size:50px}
+}
+
+
+/* ===== Sohbetix V14 overrides ===== */
+html,body{max-width:100%;overflow-x:hidden}
+.brand span,.control,.pro{color:var(--brand)!important}
+.btn.green{background:linear-gradient(135deg,#8b0000,#b11226)!important;box-shadow:0 7px 20px rgba(139,0,0,.18)!important}
+.control{border-color:#e1c4c4!important;background:#fff7f7!important}
+.chat-title,.profile-bluebar,.openchat-top{background:linear-gradient(135deg,#8b0000,#aa0000)!important}
+.tab.active{background:#9e0000!important}
+.online-count{padding-left:18px!important;text-align:left!important;display:flex;align-items:center;justify-content:flex-start;font-weight:700}
+.social-icon{width:18px;height:18px;fill:currentColor;flex:0 0 18px}
+.social{display:inline-flex;align-items:center;gap:8px}
+.social.x{background:#080808;color:#fff}.social.fb{background:#1877f2;color:#fff}.social.tg{background:#229ed9;color:#fff}
+.coin-balance{display:flex;align-items:center;gap:10px;font-size:18px;color:var(--brand);margin-bottom:18px}.coin-balance img{width:30px;height:30px;object-fit:contain}
+.coins-menu a.active{background:var(--brand)!important;color:#fff!important;border-radius:10px}
+.coin-purchase-card{max-width:650px;margin:24px 0;background:#fff;border:1px solid #e1e5ea;border-radius:18px;padding:24px;box-shadow:0 14px 36px rgba(17,24,39,.08)}
+.coin-title-row{display:flex;align-items:center;gap:18px;margin-bottom:24px}.coin-title-row img{width:74px;height:74px;object-fit:contain;filter:drop-shadow(0 6px 10px rgba(0,0,0,.16))}
+.coin-title-row h1{margin:0 0 4px;font-size:28px}.coin-title-row p{margin:0;color:#667085}
+.payment-tabs{display:flex;gap:10px;margin:14px 0 22px}.payment-tab{border:1px solid #cfd6de;background:#fff;border-radius:10px;padding:12px 18px;font-size:16px;display:inline-flex;align-items:center;gap:9px;cursor:pointer}.payment-tab.active{background:#f2f4f7;border-color:#98a2b3}
+.card-icon{width:24px;height:16px;border:2px solid currentColor;border-radius:3px;position:relative;display:inline-block}.card-icon:after{content:"";position:absolute;left:0;right:0;top:3px;border-top:2px solid currentColor}
+.dots-icon{font-size:20px;letter-spacing:2px}.payment-panel{padding-top:4px}.coin-calc label{display:block;font-weight:700;margin-bottom:8px}
+.coin-calc-row{display:flex;align-items:center;gap:12px}.coin-calc-row input{width:150px;font-size:20px;padding:12px;border:1px solid #98a2b3;border-radius:8px}
+.price-result{margin:16px 0 20px;display:flex;flex-direction:column;gap:4px}.price-result strong{font-size:28px;color:var(--brand)}.price-result small{color:#667085}
+.pay-button{background:var(--brand);color:#fff;border:0;border-radius:10px;padding:14px 22px;font-weight:700;font-size:16px;cursor:pointer}
+.alt-pay{width:100%;display:flex;align-items:center;gap:16px;text-align:left;border:1px solid #e0e4e8;border-radius:14px;background:#fff;padding:16px;margin:12px 0;cursor:pointer}.alt-pay span:last-child{display:flex;flex-direction:column;gap:3px}.alt-pay small{color:#667085}
+.bank-logo{width:45px;height:45px;border-radius:50%;display:grid;place-items:center;background:#eef2f6}.bank-logo svg{width:28px;height:28px;fill:#172033}
+.btc-logo{width:45px;height:45px;border-radius:50%;display:grid;place-items:center;background:#f7931a;color:#fff;font-weight:800;font-size:30px}
+.payment-notice{margin-top:18px;border:1px solid #e5c4c8;background:#fff6f7;color:#5f1018;border-radius:10px;padding:12px}
+.v14-select{position:relative}
+.chat-select>button{width:40px;height:40px;border:1px solid #a6aeb8;background:#fff;border-radius:8px;cursor:pointer}
+.chat-select-menu{position:absolute;left:16px;right:16px;top:calc(100% + 10px);background:#fff;border:1px solid var(--line);border-radius:14px;box-shadow:var(--shadow-lg);padding:10px;display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;z-index:50}
+.chat-select-menu a{display:flex;align-items:center;gap:8px;padding:12px 14px;border:1px solid #edf1f5;background:#f9fbfd;border-radius:12px;color:#445066;font-weight:700}
+.chat-select-menu a:hover{background:#f1f5f9}
+.v14-dash-grid .dash-menu{background:#fff;border:1px solid var(--line);border-radius:16px;padding:10px;box-shadow:0 4px 12px rgba(15,23,42,.03)}
+.v14-dash-grid .dash-menu button{padding:14px 14px;font-size:15px;border-radius:12px}
+.v14-social-box .side-title{font-weight:800;background:#fff8ef;color:#7a3a00}
+.social-action-list{padding:12px;display:flex;flex-direction:column;gap:10px}
+.social-action{display:flex!important;align-items:center;gap:10px;padding:12px 14px!important;border-radius:12px;margin:0 12px 12px;border:0!important;color:#fff!important;font-weight:800}
+.social-action.x{background:#0f1115}.social-action.tg{background:#229ed9}.social-action.fb{background:#1877f2}
+.referral{font-weight:700}
+.openchat-shell{padding:28px 0}.standalone-chat{max-width:980px;margin:0 auto}.openchat-layout-v14{grid-template-columns:minmax(0,1fr) 220px}.openchat-search-v14{padding:10px;border-bottom:1px solid var(--line)}.openchat-search-v14 input{width:100%;height:40px;padding:0 12px;border:1px solid #d9e1e7;border-radius:12px}.openchat-messages{height:420px}.v14-openchat-page{padding-bottom:40px}
+@media(max-width:900px){.v14-dash-grid{grid-template-columns:1fr!important}.dash-right{display:block!important}.chat-select-menu{grid-template-columns:1fr}}
+@media(max-width:760px){.chat-layout{grid-template-columns:minmax(0,1fr) 170px}.openchat-layout-v14{grid-template-columns:minmax(0,1fr) 210px}.v14-dash-grid .dash-menu{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}.v14-dash-grid .dash-menu button:last-child{grid-column:1/-1}.coin-purchase-card{padding:18px;border-radius:14px}.coin-title-row img{width:58px;height:58px}}
+@media(max-width:640px){.chat-layout,.openchat-layout-v14{grid-template-columns:minmax(0,1fr) 150px}.chat-title{font-size:12px}.messages,.openchat-messages{height:340px}.chat-select-menu{left:10px;right:10px}}
+
+/* ===== V15 standalone live-chat demo ===== */
+/* Ana sayfa demo sohbet: kullanıcılar %23 solda, mesajlar %77 sağda */
+.chat-layout{grid-template-columns:minmax(110px,23%) minmax(0,77%)!important}
+.chat-layout>.users{order:1!important;grid-column:1!important;border-left:0!important;border-right:1px solid var(--line)!important;border-radius:0 0 0 16px!important}
+.chat-layout>.chat-main{order:2!important;grid-column:2!important;min-width:0!important}
+.chat-layout .locked-composer{border-radius:0 0 16px 0!important}
+
+.room-page-v15{margin:0;background:#f4f6f8;color:#172033;min-height:100vh;font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
+.room-page-v15 *{box-sizing:border-box}
+.room-shell-v15{min-height:100vh;padding:0;background:#fff}
+.room-card-v15{min-height:100vh;display:flex;flex-direction:column;background:#fff}
+.room-titlebar-v15{height:44px;display:flex;align-items:center;justify-content:space-between;padding:0 8px;background:#980000;color:#fff;border-bottom:1px solid #750000}
+.room-title-btn-v15,.room-account-v15>button{border:0;background:transparent;color:#fff;font-weight:800;font-size:14px;padding:7px 6px;cursor:pointer}
+.room-account-v15{position:relative}.room-account-v15>button{display:flex;align-items:center;gap:7px}.room-account-icon{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:4px;background:#fff;color:#980000;font-size:12px}
+.room-account-menu-v15{position:absolute;top:38px;right:0;z-index:40;width:145px;background:#fff;border:1px solid #d8dee5;border-radius:8px;box-shadow:0 12px 30px rgba(0,0,0,.16);padding:5px}
+.room-account-menu-v15 button{width:100%;border:0;background:#fff;color:#8b0000;text-align:left;padding:9px 10px;border-radius:6px;cursor:pointer}.room-account-menu-v15 button:hover{background:#fff1f1}
+.room-grid-v15{display:grid;grid-template-columns:minmax(130px,23%) minmax(0,77%);flex:1;min-height:calc(100vh - 44px)}
+.room-users-v15{grid-column:1;min-width:0;border-right:1px solid #d8dee5;background:#fbfcfd;display:flex;flex-direction:column}
+.room-online-v15{height:38px;padding:0 10px;display:flex;align-items:center;border-bottom:1px solid #e2e7ec;color:#596575;font-size:12px;font-weight:700}
+.room-search-v15{padding:6px;border-bottom:1px solid #e2e7ec}.room-search-v15 input{width:100%;height:32px;border:1px solid #d5dce3;border-radius:5px;padding:0 8px;font:inherit;outline:none}.room-search-v15 input:focus{border-color:#980000;box-shadow:0 0 0 2px rgba(152,0,0,.08)}
+.room-user-list-v15{list-style:none;margin:0;padding:7px 5px;overflow:auto}.room-user-list-v15 li{display:flex;align-items:center;gap:6px;padding:6px 4px;min-width:0}.room-user-list-v15 b{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.room-mini-avatar-v15{width:22px;height:22px;flex:0 0 22px;border-radius:5px;display:grid;place-items:center;background:linear-gradient(135deg,#ffe85a,#f0bd15);border:1px solid #e1b318;color:#1e293b;font-weight:900;font-size:11px}
+.room-chat-v15{grid-column:2;min-width:0;display:flex;flex-direction:column;background:#fff;position:relative}
+.room-tabs-v15{height:38px;padding:4px 8px;background:#f6f7f9;border-bottom:1px solid #dfe4e8}.room-tabs-v15 button{height:30px;border:0;border-radius:4px;background:#980000;color:#fff;padding:0 14px;font-weight:700}
+.room-messages-v15{flex:1;min-height:0;overflow:auto;padding:10px 16px;background:#fff}
+.room-empty-v15{color:#9aa4af;font-size:12px;padding:10px 0}.system-message-v15{font-size:12px;color:#8a929d;font-style:italic;padding:5px 0;display:flex;align-items:center;gap:6px;flex-wrap:wrap}.system-message-v15.leave{color:#9a7d7d}.system-nick-v15{border:0;background:transparent;color:#980000;font-weight:800;padding:0;cursor:pointer}.system-message-v15 small{font-size:9px;color:#a4acb4}
+.live-message-v15{display:grid;grid-template-columns:34px minmax(0,1fr);gap:9px;margin:10px 0}.live-avatar-v15{width:34px;height:34px;border-radius:8px;display:grid;place-items:center;background:#ffd548;border:2px solid #e5b82c;color:#1f2937;font-weight:900}.live-message-meta-v15{display:flex;align-items:baseline;gap:7px}.live-message-meta-v15 b{font-size:13px}.live-message-meta-v15 small{font-size:10px;color:#969fa9}.live-message-body-v15 p{margin:3px 0 0;font-size:13px;line-height:1.45;white-space:pre-wrap;overflow-wrap:anywhere}
+.room-guest-footer-v15{display:flex;justify-content:flex-end;align-items:center;min-height:42px;padding:5px 8px;border-top:1px solid #d9e0e6;background:#f5f7f9}.room-enter-v15{border:1px solid #7d0000;background:#980000;color:#fff;border-radius:5px;padding:7px 14px;font-weight:800;cursor:pointer}
+.room-composer-v15{border-top:1px solid #d7dde3;background:#f4f6f8;padding:5px}.room-compose-box-v15{position:relative}.room-compose-box-v15 textarea{display:block;width:100%;min-height:48px;max-height:110px;resize:vertical;border:1px solid #bec8d2;border-radius:4px;padding:8px 35px 8px 8px;font:inherit;outline:none}.room-compose-box-v15 textarea:focus{border-color:#980000}.room-smiley-v15{position:absolute;right:6px;top:6px;border:0;background:transparent;font-size:20px;color:#7a8490;cursor:pointer}.room-compose-actions-v15{display:flex;align-items:center;justify-content:space-between;padding-top:5px}.room-profile-hint-v15{font-size:11px;color:#687483}.room-send-v15{border:0;background:#980000;color:#fff;border-radius:4px;padding:7px 14px;font-weight:800;cursor:pointer}
+
+.join-overlay-v15[hidden],.room-account-v15[hidden],.room-account-menu-v15[hidden],.room-composer-v15[hidden],.room-guest-footer-v15[hidden]{display:none!important}
+.join-overlay-v15{position:fixed;inset:0;z-index:1000;background:rgba(0,0,0,.48);display:grid;place-items:center;padding:14px}
+.join-modal-v15{width:min(340px,calc(100vw - 28px));background:#fff;border:1px solid #aeb6be;border-radius:6px;box-shadow:0 18px 45px rgba(0,0,0,.26);overflow:hidden}
+.join-modal-title-v15{height:34px;background:#980000;color:#fff;display:flex;align-items:center;justify-content:space-between;padding-left:10px;font-size:13px;font-weight:800}.join-modal-title-v15 button{width:34px;height:34px;border:0;background:transparent;color:#fff;font-size:22px;cursor:pointer}
+.join-modal-body-v15{padding:14px 16px 12px}.join-modal-body-v15 h2{font-size:14px;margin:0 0 9px;color:#111827}.join-oauth-v15{display:flex;justify-content:center;gap:16px;margin:7px 0 11px}.disabled-auth-v15{width:36px;height:36px;border:1px solid #d4d9de;background:#f7f8f9;border-radius:7px;font-size:24px;font-weight:800;color:#8f98a2;cursor:not-allowed;opacity:.65}.google-v15 span{font-size:21px;color:#4285f4}
+.join-or-v15{display:grid;grid-template-columns:1fr auto 1fr;gap:8px;align-items:center;color:#808996;font-size:11px;margin:3px 0 12px}.join-or-v15 span{height:1px;background:#dde2e6}.join-or-v15 b{font-weight:500}.join-nick-v15{width:100%;height:38px;border:1px solid #ccd3d9;border-radius:5px;padding:0 10px;text-align:center;font-size:14px;outline:none}.join-nick-v15:focus{border-color:#980000;box-shadow:0 0 0 2px rgba(152,0,0,.08)}.nick-help-v15{font-size:10px;color:#7d8791;text-align:right;margin:4px 1px 9px}
+
+.join-submit-v15{display:block;width:100%;height:38px;border:0;border-radius:5px;background:#980000;color:#fff;font-weight:800;margin-top:10px;cursor:pointer}.join-submit-v15:disabled{background:#c9cdd2;color:#f5f5f5;cursor:not-allowed}.join-legal-v15{font-size:9px;line-height:1.35;text-align:center;color:#697481;margin:9px 0 0}.join-legal-v15 a{color:#8b0000;font-weight:700}
+
+@media(max-width:760px){
+  .chat-layout{grid-template-columns:minmax(96px,23%) minmax(0,77%)!important}
+  .chat-layout>.users{border-radius:0 0 0 14px!important}.chat-layout .locked-composer{border-radius:0 0 14px 0!important}
+  .room-grid-v15{grid-template-columns:minmax(98px,23%) minmax(0,77%)}
+  .room-titlebar-v15{height:48px}.room-grid-v15{min-height:calc(100vh - 48px)}
+  .room-online-v15{padding:0 7px;font-size:11px}.room-search-v15{padding:5px}.room-search-v15 input{height:34px;padding:0 6px;font-size:11px}
+  .room-user-list-v15{padding:6px 3px}.room-user-list-v15 li{padding:6px 2px;gap:4px}.room-user-list-v15 b{font-size:10px}.room-mini-avatar-v15{width:20px;height:20px;flex-basis:20px;font-size:10px}
+  .room-tabs-v15{height:45px;padding:5px 8px}.room-tabs-v15 button{height:35px;font-size:13px}.room-messages-v15{padding:8px 10px}
+  .live-message-v15{grid-template-columns:32px minmax(0,1fr);gap:7px}.live-avatar-v15{width:32px;height:32px}.live-message-meta-v15 b{font-size:12px}.live-message-body-v15 p{font-size:12px}
+  .room-profile-hint-v15{font-size:9px}.room-send-v15{padding:7px 11px}.room-enter-v15{padding:7px 12px}
+}
+
+/* ===== SOHBETIX V16 CHAT TUNING ===== */
+/* Sol kullanıcı alanı V15'e göre yaklaşık %10 daha dar: 23% -> 21%. */
+.room-grid-v15{
+  grid-template-columns:minmax(116px,21%) minmax(0,79%) !important;
+}
+.room-users-v15{
+  overflow:hidden;
+}
+.room-user-list-v15 li{
+  align-items:flex-start !important;
+}
+.room-user-list-v15 b{
+  display:block;
+  min-width:0;
+  white-space:normal !important;
+  overflow:visible !important;
+  text-overflow:clip !important;
+  overflow-wrap:anywhere;
+  word-break:break-word;
+  line-height:1.15;
+}
+
+/* Girişten önce görünen Bismillah + 3'er Türk bayrağı. */
+.prejoin-blessing-v16{
+  display:flex;
+  align-items:center;
+  justify-content:flex-start;
+  flex-wrap:wrap;
+  gap:10px;
+  padding:16px 18px 12px;
+  border-bottom:1px solid #eceff2;
+  background:#fff;
+  color:#0b39d6;
+}
+.prejoin-blessing-v16[hidden]{display:none!important}
+.prejoin-blessing-v16 strong{
+  font-size:22px;
+  line-height:1.2;
+  font-weight:950;
+  letter-spacing:.1px;
+  color:#0b39d6;
+  text-shadow:0 0 .01px currentColor;
+}
+.flag-group-v16{
+  display:inline-flex;
+  align-items:center;
+  gap:4px;
+  flex:0 0 auto;
+}
+.flag-group-v16 span{
+  display:inline-block;
+  font-size:34px;
+  line-height:1;
+  filter:saturate(1.1);
+}
+
+/* Katıldı / ayrıldı sistem mesajları net, kalın ve siyah. */
+.system-message-v15,
+.system-message-v15.leave{
+  color:#111 !important;
+  font-style:normal !important;
+  font-weight:900 !important;
+}
+.system-nick-v15{
+  color:#111 !important;
+  font-weight:950 !important;
+  font-size:inherit;
+}
+.system-message-v15 span{
+  color:#111 !important;
+  font-weight:900 !important;
+}
+.system-message-v15 small{
+  color:#6f7782 !important;
+  font-weight:700 !important;
+}
+
+@media(max-width:760px){
+  .room-grid-v15{
+    grid-template-columns:minmax(105px,21%) minmax(0,79%) !important;
+  }
+  .room-user-list-v15 b{
+    font-size:10px !important;
+    line-height:1.12 !important;
+  }
+  .prejoin-blessing-v16{
+    gap:6px;
+    padding:12px 10px 10px;
+  }
+  .prejoin-blessing-v16 strong{
+    font-size:15px;
+    overflow-wrap:anywhere;
+  }
+  .flag-group-v16{gap:2px}
+  .flag-group-v16 span{font-size:23px}
+}
+
+@media(max-width:430px){
+  .room-grid-v15{
+    grid-template-columns:minmax(96px,22%) minmax(0,78%) !important;
+  }
+  .prejoin-blessing-v16 strong{font-size:13px}
+  .flag-group-v16 span{font-size:20px}
+}
+
+/* ===== SOHBETIX V17: SABİT CHAT + 10.000 MESAJ BOT TEMİZLİĞİ ===== */
+/* Tarayıcı sayfası büyümez; sadece mesaj panelinin içi kayar. */
+html:has(body.room-page-v15),
+body.room-page-v15{
+  height:100%;
+  min-height:100%;
+  overflow:hidden !important;
+}
+body.room-page-v15{
+  width:100%;
+}
+.room-shell-v15,
+.room-card-v15{
+  height:100vh !important;
+  height:100dvh !important;
+  min-height:0 !important;
+  max-height:100vh !important;
+  max-height:100dvh !important;
+  overflow:hidden !important;
+}
+.room-grid-v15{
+  min-height:0 !important;
+  height:calc(100vh - 44px) !important;
+  height:calc(100dvh - 44px) !important;
+  overflow:hidden !important;
+  grid-template-columns:minmax(105px,19%) minmax(0,81%) !important;
+}
+.room-users-v15,
+.room-chat-v15{
+  min-height:0 !important;
+  height:100% !important;
+  overflow:hidden !important;
+}
+.room-user-list-v15{
+  flex:1 1 auto !important;
+  min-height:0 !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+}
+.room-chat-v15{
+  display:grid !important;
+  grid-template-rows:auto auto minmax(0,1fr) auto !important;
+}
+.prejoin-blessing-v16[hidden]{display:none!important}
+.room-messages-v15{
+  min-height:0 !important;
+  height:auto !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  overscroll-behavior:contain;
+  scrollbar-gutter:stable;
+}
+.room-guest-footer-v15,
+.room-composer-v15{
+  flex:0 0 auto !important;
+  position:relative;
+  z-index:3;
+}
+.room-compose-box-v15 textarea{
+  resize:none !important;
+  height:48px !important;
+  min-height:48px !important;
+  max-height:48px !important;
+}
+
+/* Sohbetix Bot: neon pembe, kalın ve sabit kullanıcı listesinde. */
+.room-bot-user-v17 b,
+.bot-message-meta-v17 b{
+  color:#ff1493 !important;
+  font-weight:950 !important;
+  text-shadow:0 0 5px rgba(255,20,147,.48),0 0 12px rgba(255,20,147,.24);
+}
+.room-bot-avatar-v17,
+.bot-avatar-v17{
+  background:linear-gradient(135deg,#ff4db2,#ff1493) !important;
+  border-color:#ff1493 !important;
+  color:#fff !important;
+  font-weight:950 !important;
+  box-shadow:0 0 10px rgba(255,20,147,.35);
+}
+.bot-message-v17{
+  display:grid;
+  grid-template-columns:34px minmax(0,1fr);
+  gap:9px;
+  margin:10px 0;
+  padding:8px 10px;
+  border-left:3px solid #ff1493;
+  background:rgba(255,20,147,.055);
+  border-radius:6px;
+}
+.bot-avatar-v17{
+  width:34px;height:34px;border-radius:8px;display:grid;place-items:center;
+}
+.bot-message-meta-v17{display:flex;align-items:baseline;gap:7px}
+.bot-message-meta-v17 b{font-size:13px}
+.bot-message-meta-v17 small{font-size:10px;color:#969fa9}
+.bot-message-body-v17 p{
+  margin:3px 0 0;
+  color:#ff1493 !important;
+  font-weight:950 !important;
+  line-height:1.45;
+  overflow-wrap:anywhere;
+  text-shadow:0 0 4px rgba(255,20,147,.18);
+}
+
+/* Katıldı / ayrıldı bildirimleri kalın siyah. */
+.system-message-v15,
+.system-message-v15.leave,
+.system-message-v15 span{
+  color:#111 !important;
+  font-weight:900 !important;
+  font-style:normal !important;
+}
+.system-message-v15 .system-nick-v15{
+  font-weight:950 !important;
+}
+
+@media(max-width:760px){
+  .room-grid-v15{
+    height:calc(100vh - 48px) !important;
+    height:calc(100dvh - 48px) !important;
+    grid-template-columns:minmax(90px,19%) minmax(0,81%) !important;
+  }
+  .room-bot-user-v17 b{font-size:9px !important}
+  .bot-message-v17{grid-template-columns:30px minmax(0,1fr);gap:7px;padding:7px 8px}
+  .bot-avatar-v17{width:30px;height:30px}
+}
+
+/* ===== V17 FIX: sadece mesaj bölümü sabit chat görünümü =====
+   Amaç: sayfanın kendisi aşağı kaymaz; üst bar, sol kullanıcı listesi ve mesaj yazma alanı sabit kalır.
+   Yalnızca mesaj listesi kendi içinde dikey kayar. */
+html:has(body.room-page-v15),
+html:has(body.room-page-v15) body{
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+  max-height:100% !important;
+  overflow:hidden !important;
+}
+body.room-page-v15{
+  position:fixed !important;
+  inset:0 !important;
+  margin:0 !important;
+}
+.room-shell-v15{
+  position:absolute !important;
+  inset:0 !important;
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+  max-height:none !important;
+  overflow:hidden !important;
+}
+.room-card-v15{
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+  max-height:none !important;
+  overflow:hidden !important;
+  display:grid !important;
+  grid-template-rows:44px minmax(0,1fr) !important;
+}
+.room-titlebar-v15{
+  height:44px !important;
+  min-height:44px !important;
+  max-height:44px !important;
+}
+.room-grid-v15{
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  overflow:hidden !important;
+}
+.room-users-v15,
+.room-chat-v15{
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  overflow:hidden !important;
+}
+.room-chat-v15{
+  display:grid !important;
+  grid-template-rows:auto auto minmax(0,1fr) auto !important;
+}
+.room-messages-v15{
+  height:auto !important;
+  min-height:0 !important;
+  max-height:none !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  overscroll-behavior:contain !important;
+  -webkit-overflow-scrolling:touch;
+}
+.room-composer-v15,
+.room-guest-footer-v15{
+  position:relative !important;
+  inset:auto !important;
+  flex:none !important;
+  min-height:0 !important;
+  margin:0 !important;
+  z-index:5 !important;
+}
+.room-composer-v15{
+  padding:4px 5px 5px !important;
+}
+.room-compose-box-v15 textarea{
+  height:44px !important;
+  min-height:44px !important;
+  max-height:44px !important;
+  resize:none !important;
+}
+.room-compose-actions-v15{
+  min-height:25px !important;
+  padding-top:4px !important;
+}
+@media(max-width:760px){
+  .room-card-v15{
+    grid-template-rows:48px minmax(0,1fr) !important;
+  }
+  .room-titlebar-v15{
+    height:48px !important;
+    min-height:48px !important;
+    max-height:48px !important;
+  }
+  .room-compose-box-v15 textarea{
+    height:42px !important;
+    min-height:42px !important;
+    max-height:42px !important;
+  }
+}
+
+/* V18 functional settings */
+.domain-error-v18{margin:10px 0;color:#b00020;font-weight:800}.disabled-own-domain-v18{opacity:.62}.chat-disabled-v18{margin:18px;padding:16px;border:1px solid #efb4b4;background:#fff0f0;color:#8f0000;font-weight:900;border-radius:10px;text-align:center}.live-image-v18{max-width:min(520px,92%);max-height:420px;border-radius:10px;border:1px solid #dfe4ea;display:block;margin-top:7px}.settings-char-v18{font-size:11px;color:#7c8796}.private-toast-v18{position:fixed;right:16px;bottom:84px;background:#222;color:#fff;padding:10px 14px;border-radius:10px;z-index:99;font-size:12px;box-shadow:0 8px 30px #0002}
+
+
+/* ===== V18 MOBILE FIX: mesaj kutusu ve chat kabuğu mobilde sabit =====
+   Mobil klavye açıldığında visualViewport yüksekliği JS ile --room-viewport-height
+   değişkenine yazılır. Böylece sayfa uzamaz; yalnızca mesaj listesi küçülüp kayar. */
+html.room-fixed-viewport,
+html.room-fixed-viewport body.room-page-v15{
+  width:100% !important;
+  height:var(--room-viewport-height,100dvh) !important;
+  min-height:0 !important;
+  max-height:var(--room-viewport-height,100dvh) !important;
+  overflow:hidden !important;
+  overscroll-behavior:none !important;
+}
+html.room-fixed-viewport body.room-page-v15{
+  position:fixed !important;
+  top:var(--room-viewport-top,0px) !important;
+  left:0 !important;
+  right:0 !important;
+  bottom:auto !important;
+}
+html.room-fixed-viewport .room-shell-v15,
+html.room-fixed-viewport .room-card-v15{
+  width:100% !important;
+  height:100% !important;
+  min-height:0 !important;
+  max-height:100% !important;
+  overflow:hidden !important;
+}
+html.room-fixed-viewport .room-card-v15{
+  display:grid !important;
+  grid-template-rows:44px minmax(0,1fr) !important;
+}
+html.room-fixed-viewport .room-grid-v15{
+  height:100% !important;
+  min-height:0 !important;
+  max-height:100% !important;
+  overflow:hidden !important;
+}
+html.room-fixed-viewport .room-users-v15,
+html.room-fixed-viewport .room-chat-v15{
+  height:100% !important;
+  min-height:0 !important;
+  max-height:100% !important;
+  overflow:hidden !important;
+}
+html.room-fixed-viewport .room-chat-v15{
+  display:grid !important;
+  grid-template-rows:auto auto minmax(0,1fr) auto !important;
+}
+html.room-fixed-viewport .room-messages-v15{
+  min-height:0 !important;
+  height:100% !important;
+  max-height:100% !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  -webkit-overflow-scrolling:touch !important;
+  overscroll-behavior-y:contain !important;
+}
+html.room-fixed-viewport .room-composer-v15,
+html.room-fixed-viewport .room-guest-footer-v15{
+  position:relative !important;
+  flex:none !important;
+  margin:0 !important;
+  z-index:20 !important;
+}
+html.room-fixed-viewport .room-compose-box-v15 textarea{
+  resize:none !important;
+}
+@media(max-width:760px){
+  html.room-fixed-viewport .room-card-v15{
+    grid-template-rows:48px minmax(0,1fr) !important;
+  }
+  html.room-fixed-viewport .room-titlebar-v15{
+    height:48px !important;
+    min-height:48px !important;
+    max-height:48px !important;
+  }
+  html.room-fixed-viewport .room-grid-v15{
+    grid-template-columns:minmax(88px,19%) minmax(0,81%) !important;
+  }
+  html.room-fixed-viewport .room-composer-v15{
+    padding-bottom:max(5px,env(safe-area-inset-bottom)) !important;
+  }
+}
+
+
+/* ==========================================================
+   SOHBETIX V19 — CHAT LAYOUT + FIXED COMPOSER + MOBILE MENU
+   1) Mesaj yazma alanı chatin ALTINDA sabit kalır.
+   2) Yalnızca mesaj listesi kendi içinde yukarı/aşağı kayar.
+   3) Chat solda/geniş, çevrimiçi + arama + kullanıcılar sağda/dar.
+   ========================================================== */
+
+/* Oda kabuğu viewport dışına taşmasın. */
+html.room-fixed-viewport .room-card-v15,
+body.room-page-v15 .room-card-v15{
+  grid-template-rows:44px minmax(0,1fr) !important;
+}
+
+/* SOL = CHAT, SAĞ = KULLANICI LİSTESİ */
+html.room-fixed-viewport .room-grid-v15,
+body.room-page-v15 .room-grid-v15{
+  grid-template-columns:minmax(0,79%) minmax(116px,21%) !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+}
+html.room-fixed-viewport .room-chat-v15,
+body.room-page-v15 .room-chat-v15{
+  grid-column:1 !important;
+  grid-row:1 !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+  border-right:1px solid #d8dee5 !important;
+  display:grid !important;
+  grid-template-rows:auto auto minmax(0,1fr) auto !important;
+}
+html.room-fixed-viewport .room-users-v15,
+body.room-page-v15 .room-users-v15{
+  grid-column:2 !important;
+  grid-row:1 !important;
+  min-width:0 !important;
+  min-height:0 !important;
+  overflow:hidden !important;
+  border-right:0 !important;
+  border-left:0 !important;
+}
+
+/* Sağ sütunun sadece kullanıcı listesi kayar. Online ve arama sabit. */
+.room-users-v15{
+  display:grid !important;
+  grid-template-rows:auto auto minmax(0,1fr) !important;
+}
+.room-online-v15,
+.room-search-v15{
+  flex:none !important;
+}
+.room-user-list-v15{
+  min-height:0 !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  -webkit-overflow-scrolling:touch !important;
+}
+
+/* Chatin yalnızca MESAJ bölümü kayar; alt yazma alanı kesinlikle sabittir. */
+html.room-fixed-viewport .room-messages-v15,
+body.room-page-v15 .room-messages-v15{
+  min-height:0 !important;
+  height:auto !important;
+  max-height:none !important;
+  overflow-y:auto !important;
+  overflow-x:hidden !important;
+  overscroll-behavior-y:contain !important;
+  -webkit-overflow-scrolling:touch !important;
+}
+html.room-fixed-viewport .room-composer-v15,
+body.room-page-v15 .room-composer-v15,
+html.room-fixed-viewport .room-guest-footer-v15,
+body.room-page-v15 .room-guest-footer-v15{
+  position:relative !important;
+  left:auto !important;
+  right:auto !important;
+  bottom:auto !important;
+  flex:none !important;
+  width:100% !important;
+  margin:0 !important;
+  z-index:25 !important;
+  background:#f4f6f8 !important;
+}
+.room-compose-box-v15 textarea{
+  resize:none !important;
+}
+
+/* Mobilde oranı resimdeki gibi chat ağırlıklı tut. */
+@media(max-width:760px){
+  html.room-fixed-viewport .room-card-v15,
+  body.room-page-v15 .room-card-v15{
+    grid-template-rows:48px minmax(0,1fr) !important;
+  }
+  html.room-fixed-viewport .room-grid-v15,
+  body.room-page-v15 .room-grid-v15{
+    grid-template-columns:minmax(0,76%) minmax(96px,24%) !important;
+  }
+  .room-chat-v15{border-right:1px solid #d8dee5 !important}
+  .room-online-v15{padding:0 7px !important;font-size:11px !important}
+  .room-search-v15{padding:5px !important}
+  .room-search-v15 input{height:38px !important;font-size:12px !important}
+  .room-user-list-v15{padding:6px 3px !important}
+  .room-user-list-v15 li{padding:6px 2px !important;gap:4px !important}
+  .room-user-list-v15 b{font-size:10px !important}
+  .room-messages-v15{padding:8px 10px !important}
+  .room-composer-v15{padding:5px !important;padding-bottom:max(5px,env(safe-area-inset-bottom)) !important}
+  .room-compose-box-v15 textarea{height:48px !important;min-height:48px !important;max-height:48px !important}
+}
+
+/* Çok dar telefonlarda sağ liste hâlâ kullanılabilir kalsın. */
+@media(max-width:420px){
+  html.room-fixed-viewport .room-grid-v15,
+  body.room-page-v15 .room-grid-v15{
+    grid-template-columns:minmax(0,74%) minmax(88px,26%) !important;
+  }
+}
+
+/* Ana sayfa hamburger paneli: hidden kesin kapanır, açıldığında üstte görünür. */
+.mobile-nav-panel[hidden],
+.mobile-more-menu[hidden]{display:none !important}
+@media(max-width:760px){
+  .mobile-menu-btn{cursor:pointer;touch-action:manipulation;position:relative;z-index:101}
+  .mobile-nav-panel:not([hidden]){display:block !important;z-index:100 !important}
+}
+
+/* ==========================================================
+   SOHBETIX V19.1 — MESAJ ALANI KESIN ALT SABITLEME
+   Grid cocuklari acik/gizli degisse bile mesaj kutusu row 4'te kalir.
+   ========================================================== */
+html.room-fixed-viewport .room-grid-v15,
+body.room-page-v15 .room-grid-v15{
+  grid-template-rows:minmax(0,1fr) !important;
+  align-items:stretch !important;
+}
+html.room-fixed-viewport .room-chat-v15,
+body.room-page-v15 .room-chat-v15{
+  height:100% !important;
+  align-self:stretch !important;
+  grid-template-rows:auto auto minmax(0,1fr) auto !important;
+}
+html.room-fixed-viewport .room-tabs-v15,
+body.room-page-v15 .room-tabs-v15{
+  grid-row:1 !important;
+}
+html.room-fixed-viewport .prejoin-blessing-v16,
+body.room-page-v15 .prejoin-blessing-v16,
+html.room-fixed-viewport .chat-disabled-v18,
+body.room-page-v15 .chat-disabled-v18{
+  grid-row:2 !important;
+}
+html.room-fixed-viewport .room-messages-v15,
+body.room-page-v15 .room-messages-v15{
+  grid-row:3 !important;
+  height:auto !important;
+  min-height:0 !important;
+  align-self:stretch !important;
+  overflow-y:auto !important;
+}
+html.room-fixed-viewport .room-guest-footer-v15,
+body.room-page-v15 .room-guest-footer-v15,
+html.room-fixed-viewport .room-composer-v15,
+body.room-page-v15 .room-composer-v15{
+  grid-row:4 !important;
+  align-self:end !important;
+  position:relative !important;
+  bottom:auto !important;
+  width:100% !important;
+}
+
+/* ==========================================================
+   SOHBETIX V20 — KULLANICI MENUSU + SON MESAJLAR
+   ========================================================== */
+.user-target-v20{cursor:pointer}
+.sohbetix-user-menu-v20{
+  position:fixed;z-index:9999;background:#fff;border:1px solid #d8dde4;border-radius:10px;
+  box-shadow:0 12px 34px rgba(0,0,0,.20);overflow:hidden;padding:7px;
+  font-family:inherit;color:#171717;
+}
+.sohbetix-user-menu-head-v20{display:flex;align-items:center;gap:9px;padding:7px 8px 10px;border-bottom:1px solid #edf0f3;margin-bottom:4px}
+.sohbetix-user-menu-avatar-v20{width:34px;height:34px;display:grid;place-items:center;border-radius:7px;background:#ffd642;border:2px solid #e8bd24;font-weight:900;color:var(--user-color,#222)}
+.sohbetix-user-menu-head-v20 strong{font-size:15px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.sohbetix-user-menu-v20 button{width:100%;border:0;background:#fff;display:flex;align-items:center;gap:10px;padding:9px 8px;border-radius:7px;font:700 14px/1.2 inherit;text-align:left;cursor:pointer;color:#151515}
+.sohbetix-user-menu-v20 button:hover,.sohbetix-user-menu-v20 button:focus{background:#f1f4f7;outline:none}
+.sohbetix-user-menu-v20 svg{width:22px;height:22px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round;flex:0 0 22px}
+
+.room-chat-v15{position:relative!important}
+.latest-messages-v20{
+  position:absolute;right:12px;bottom:132px;z-index:40;display:inline-flex;align-items:center;gap:5px;
+  border:1px solid #c8cdd3;background:#fff;color:#202020;border-radius:8px;padding:5px 8px;
+  font:700 11px/1 inherit;box-shadow:0 2px 8px rgba(0,0,0,.12);cursor:pointer
+}
+.latest-messages-v20[hidden]{display:none!important}
+.latest-messages-v20 svg{width:15px;height:15px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+@media(max-width:760px){
+  .latest-messages-v20{right:8px;bottom:126px;font-size:10px;padding:5px 7px}
+  .sohbetix-user-menu-v20{max-width:220px}
+}
+
+
+/* ==========================================================
+   SOHBETIX V21 — GİRİŞ KİLİDİ + HESAP SAYFASI + ŞİFRE GÖSTER
+   ========================================================== */
+.room-not-joined-v21 #roomMessages,
+.room-not-joined-v21 #roomUserList,
+.room-not-joined-v21 #nickSearch,
+.room-not-joined-v21 #onlineCount,
+.room-not-joined-v21 #latestMessagesBtn{visibility:hidden!important;pointer-events:none!important}
+.room-not-joined-v21 .room-users-v15{background:#f7f8fa}
+.room-not-joined-v21 #roomMessages::after{content:''}
+.account-auth-v21{width:38px;height:38px;border:1px solid #d4d9de;background:#fff;border-radius:8px;display:grid;place-items:center;cursor:pointer;color:#980000}
+.account-auth-v21 svg{width:23px;height:23px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.account-auth-v21:hover{background:#fff1f1;border-color:#b90000}
+.room-profile-hint-v15[hidden]{display:none!important}
+
+.auth-page-v21{margin:0;background:#f3f5f8;color:#171717;font-family:Arial,Helvetica,sans-serif;min-height:100vh}
+.auth-top-v21{height:62px;background:linear-gradient(135deg,#8b0000,#b10000);display:flex;align-items:center;justify-content:space-between;padding:0 18px;box-shadow:0 2px 10px rgba(0,0,0,.14)}
+.auth-brand-v21{color:#fff;text-decoration:none;font-size:25px;font-weight:900}.auth-brand-v21 span{color:#ffd24a}.auth-back-v21{color:#fff;text-decoration:none;font-size:13px;font-weight:700;border:1px solid rgba(255,255,255,.45);padding:8px 11px;border-radius:8px}
+.auth-shell-v21{max-width:520px;margin:0 auto;padding:26px 14px 50px}.auth-card-v21{background:#fff;border:1px solid #dde2e7;border-radius:16px;padding:22px;box-shadow:0 12px 36px rgba(20,25,35,.09)}
+.auth-icon-v21{width:48px;height:48px;border-radius:12px;background:#fff1f1;color:#980000;display:grid;place-items:center;margin:0 auto 9px}.auth-icon-v21 svg{width:29px;height:29px;fill:none;stroke:currentColor;stroke-width:1.9;stroke-linecap:round;stroke-linejoin:round}
+.auth-card-v21 h1{text-align:center;margin:4px 0 5px;font-size:24px}.auth-lead-v21{text-align:center;color:#6f7883;margin:0 0 18px;font-size:13px}
+.auth-tabs-v21{display:grid;grid-template-columns:1fr 1fr;background:#f1f3f5;border-radius:10px;padding:4px;margin-bottom:18px}.auth-tabs-v21 button{border:0;background:transparent;padding:10px;border-radius:8px;font-weight:800;cursor:pointer}.auth-tabs-v21 button.active{background:#980000;color:#fff;box-shadow:0 2px 7px rgba(152,0,0,.22)}
+.auth-form-v21{display:grid;gap:12px}.auth-form-v21[hidden]{display:none!important}.auth-form-v21 label{display:grid;gap:6px;font-size:12px;font-weight:800;color:#4b5563}.auth-form-v21 input{width:100%;box-sizing:border-box;height:43px;border:1px solid #cfd6dd;border-radius:8px;padding:0 11px;font:inherit;outline:none;background:#fff}.auth-form-v21 input:focus{border-color:#980000;box-shadow:0 0 0 3px rgba(152,0,0,.08)}
+.password-wrap-v21{position:relative;display:block;width:100%}.password-wrap-v21 input{padding-right:45px!important}.password-toggle-v21{position:absolute;right:5px;top:50%;transform:translateY(-50%);width:34px;height:34px;border:0;background:transparent;color:#68737e;border-radius:7px;display:grid;place-items:center;cursor:pointer}.password-toggle-v21:hover{background:#f1f3f5}.password-toggle-v21 svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+
+.auth-submit-v21{height:44px;border:0;background:#980000;color:#fff;border-radius:9px;font-size:15px;font-weight:900;cursor:pointer}.auth-submit-v21:disabled{opacity:.45;cursor:not-allowed}.auth-status-v21{min-height:18px;font-size:12px;color:#a11111}.auth-status-v21.ok{color:#117335}.auth-demo-v21{font-size:10px;color:#7b8490;text-align:center;margin:16px 0 0;line-height:1.4}
+@media(max-width:520px){.auth-card-v21{padding:17px 13px;border-radius:12px}.auth-shell-v21{padding-top:14px}.auth-top-v21{height:56px;padding:0 12px}.auth-brand-v21{font-size:22px}}
+
+/* ===== V21 FIX: official Sohbetix logo ===== */
+.brand-logo-v21{display:inline-flex!important;align-items:center!important;flex:0 0 auto;text-decoration:none!important;overflow:hidden}
+.brand-logo-v21 img{display:block;width:auto;height:48px;max-width:170px;object-fit:contain}
+.auth-brand-v21.brand-logo-v21 img{height:50px;max-width:175px;border-radius:7px}
+@media(max-width:760px){.brand-logo-v21 img{height:42px;max-width:145px}.auth-brand-v21.brand-logo-v21 img{height:44px;max-width:150px}}
+
+
+/* ==========================================================
+   SOHBETIX V23 — composer / emoji GIF / @mention / presence
+   ========================================================== */
+.room-compose-actions-v15 .room-send-v15{
+  margin-left:auto !important;
+  flex:0 0 auto !important;
+}
+.room-compose-box-v15{overflow:visible!important}
+.emoji-panel-v23{
+  position:absolute;right:0;bottom:calc(100% + 7px);z-index:85;
+  width:min(360px,calc(100vw - 34px));max-height:330px;overflow:auto;
+  background:#fff;border:1px solid #cfd6dd;border-radius:10px;
+  box-shadow:0 10px 30px rgba(0,0,0,.20);padding:9px;
+}
+.emoji-panel-v23[hidden],.mention-suggest-v23[hidden]{display:none!important}
+.emoji-tabs-v23{display:flex;justify-content:space-between;align-items:center;padding:2px 3px 8px;border-bottom:1px solid #edf0f3;font-size:11px;color:#68737e}
+.emoji-tabs-v23 strong{color:#222}
+.emoji-grid-v23{display:grid;grid-template-columns:repeat(9,1fr);gap:3px;padding:8px 0}
+.emoji-grid-v23 button{border:0;background:transparent;border-radius:6px;font-size:22px;line-height:1;padding:5px 2px;cursor:pointer}
+.emoji-grid-v23 button:hover{background:#f0f2f5}
+
+
+
+
+.mention-suggest-v23{
+  position:absolute;left:0;right:0;bottom:calc(100% + 7px);z-index:86;
+  max-height:230px;overflow:auto;background:#fff;border:1px solid #cfd6dd;
+  border-radius:9px;box-shadow:0 10px 28px rgba(0,0,0,.18);padding:5px;
+}
+.mention-suggest-v23 button{
+  width:100%;border:0;background:#fff;display:flex;align-items:center;gap:8px;
+  padding:7px;border-radius:7px;cursor:pointer;text-align:left;
+}
+.mention-suggest-v23 button:hover,.mention-suggest-v23 button:focus{background:#f0f3f6;outline:0}
+.mention-suggest-v23 b{font-size:12px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.mention-tag-v23{color:#1678a8;font-weight:800}
+@media(max-width:600px){
+  .emoji-panel-v23{right:-2px;width:min(320px,calc(100vw - 22px));max-height:300px}
+  .emoji-grid-v23{grid-template-columns:repeat(8,1fr)}
+  
+  
+}
+
+
+/* SOHBETIX V24 - Flood/spam koruması ve daha kompakt chat */
+.live-message-meta-v15 b{font-size:12px!important}
+.live-message-meta-v15 small{font-size:9px!important}
+.live-message-body-v15 p{font-size:12px!important;line-height:1.35!important}
+.system-message-v15,.system-message-v15.leave{font-size:11px!important}
+
+.flood-warning-v24{
+  flex:0 0 auto;
+  padding:10px 12px;
+  background:#fff;
+  border-top:1px solid #e3e7eb;
+  color:#a00000;
+  font-size:12px;
+  line-height:1.38;
+}
+.flood-warning-v24[hidden]{display:none!important}
+.flood-warning-text-v24{max-width:440px}
+.flood-vip-link-v24{
+  display:inline;
+  border:0;
+  background:transparent;
+  color:#1578b8;
+  padding:0 2px;
+  margin:0;
+  font:inherit;
+  font-weight:800;
+  text-decoration:underline;
+  text-underline-offset:2px;
+  cursor:pointer;
+}
+.flood-vip-link-v24:hover{color:#0b5f96}
+.flood-countdown-v24{
+  margin-top:3px;
+  color:#737d87;
+  font-size:10px;
+  font-weight:700;
+}
+@media(max-width:640px){
+  .live-message-meta-v15 b{font-size:11.5px!important}
+  .live-message-body-v15 p{font-size:11.5px!important;line-height:1.32!important}
+  .system-message-v15,.system-message-v15.leave{font-size:10.5px!important}
+  .flood-warning-v24{font-size:11px;padding:8px 10px}
+}
+
+
+/* ==========================================================
+   SOHBETIX V25 - KAYITLI CHAT PROFIL SISTEMI
+   ========================================================== */
+
+/* Chat solda geniş, çevrimiçi panel sağda daha dar */
+.room-grid-v15{
+  grid-template-columns:minmax(0,86%) minmax(150px,14%) !important;
+}
+.room-chat-v15{
+  grid-column:1 !important;
+  grid-row:1 !important;
+  border-right:1px solid #d8dee5 !important;
+}
+.room-users-v15{
+  grid-column:2 !important;
+  grid-row:1 !important;
+  border-right:0 !important;
+  border-left:0 !important;
+}
+.room-online-v15{padding:0 7px!important;font-size:11px!important}
+.room-search-v15{padding:5px!important}
+.room-search-v15 input{padding:0 6px!important;font-size:11px!important}
+.room-user-list-v15{padding:6px 3px!important}
+.room-user-list-v15 li{gap:4px!important;padding:5px 2px!important}
+.room-user-list-v15 b{font-size:11px!important}
+.room-mini-avatar-v15{width:20px!important;height:20px!important;flex-basis:20px!important;font-size:10px!important}
+
+/* Profil modülü */
+.join-modal-v25{
+  width:min(360px,calc(100vw - 24px))!important;
+  border-radius:5px!important;
+}
+.join-modal-body-v25{padding:12px 14px 13px!important}
+.profile-brand-v25{
+  display:flex;justify-content:center;align-items:center;
+  min-height:62px;margin:-2px 0 2px;
+}
+.profile-brand-v25 img{
+  display:block;width:112px;max-height:64px;object-fit:contain;
+}
+.profile-account-v25{
+  text-align:center;font-size:12px;line-height:1.25;margin-bottom:14px;color:#20252a;
+}
+.profile-account-v25 strong{
+  display:block;color:#1674a7;font-size:13px;margin:2px 0 3px;
+  overflow-wrap:anywhere;
+}
+.profile-account-v25 button{
+  border:0;background:transparent;color:#1674a7;
+  font-weight:700;font-size:11px;cursor:pointer;padding:1px 4px;
+}
+.profile-select-head-v25{
+  display:flex;align-items:center;justify-content:space-between;
+  margin:3px 0 5px;font-size:12px;
+}
+.profile-select-head-v25>button{
+  width:28px;height:28px;border:0;background:transparent;color:#8b949e;
+  display:grid;place-items:center;cursor:pointer;border-radius:5px;
+}
+.profile-select-head-v25 svg{width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.saved-profiles-v25{display:grid;gap:4px}
+.saved-profile-row-v25{
+  position:relative;display:flex;align-items:center;min-height:38px;
+  border:1px solid #cdd5dc;border-radius:5px;background:#fff;
+}
+.saved-profile-choice-v25{
+  flex:1;display:flex;align-items:center;gap:8px;min-width:0;
+  padding:7px 8px;cursor:pointer;font-size:12px;
+}
+.saved-profile-choice-v25 span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.saved-profile-choice-v25 input{accent-color:#0b9dbb}
+.profile-more-v25{
+  width:36px;height:34px;display:grid;place-items:center;
+  border:0;background:transparent;color:#8f979e;cursor:pointer;
+}
+.profile-more-v25 svg,.profile-menu-v25 svg,.new-profile-btn-v25 svg{
+  width:17px;height:17px;fill:none;stroke:currentColor;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;
+}
+.profile-menu-v25{
+  position:absolute;right:5px;top:34px;z-index:110;
+  width:132px;padding:4px;background:#fff;border:1px solid #cfd5da;
+  border-radius:5px;box-shadow:0 7px 18px rgba(0,0,0,.18);
+}
+.profile-menu-v25[hidden]{display:none!important}
+.profile-menu-v25 button{
+  width:100%;display:flex;align-items:center;gap:8px;
+  border:0;background:#fff;color:#222;padding:8px 9px;
+  border-radius:4px;font-size:11px;cursor:pointer;text-align:left;
+}
+.profile-menu-v25 button:hover{background:#f1f4f6}
+.new-profile-btn-v25{
+  width:100%;margin-top:5px;min-height:36px;
+  display:flex;align-items:center;gap:8px;
+  border:1px dashed #cbd3da;background:#fff;color:#1590c8;
+  padding:7px 8px;border-radius:5px;font-size:11px;cursor:pointer;text-align:left;
+}
+.profile-editor-v25{margin-top:9px;position:relative}
+.profile-editor-v25[hidden]{display:none!important}
+.profile-editor-v25 label{display:block;font-size:12px;font-weight:800;margin-bottom:6px}
+.profile-editor-v25 input{
+  width:100%;height:38px;border:1px solid #20252a;border-radius:5px;
+  padding:0 42px 0 10px;text-align:center;font-size:12px;outline:none;
+}
+.profile-editor-v25 input:focus{border-color:#158bb7;box-shadow:0 0 0 2px rgba(21,139,183,.12)}
+.profile-counter-v25{
+  position:absolute;right:7px;bottom:11px;color:#8c959d;font-size:9px;
+}
+.profile-limit-v25{
+  margin-top:10px;border:1px solid #1b8fc5;background:#f8fdff;
+  border-radius:4px;padding:8px;text-align:center;font-size:10px;color:#222;
+}
+.profile-limit-v25[hidden]{display:none!important}
+.profile-limit-v25 strong{display:block;margin-bottom:4px}
+.profile-limit-v25>div{display:flex;align-items:center;justify-content:center;gap:6px;flex-wrap:wrap}
+.profile-limit-v25 button{
+  border:0;border-radius:4px;background:#43a7d5;color:#fff;
+  font-size:10px;font-weight:800;padding:6px 9px;cursor:pointer;
+}
+
+.registered-profile-panel-v25[hidden],.guest-join-panel-v25[hidden]{display:none!important}
+
+/* Sadece emoji; GIF alanı yok */
+.emoji-panel-v23{max-height:250px!important}
+.emoji-grid-v23{grid-template-columns:repeat(10,1fr)!important}
+
+/* Mobil */
+@media(max-width:760px){
+  .room-grid-v15{
+    grid-template-columns:minmax(0,78%) minmax(88px,22%) !important;
+  }
+  .room-user-list-v15 b{font-size:10.5px!important}
+  .room-search-v15 input{font-size:10px!important}
+  .room-online-v15{font-size:10px!important;padding:0 5px!important}
+}
+@media(max-width:430px){
+  .join-modal-v25{width:min(330px,calc(100vw - 18px))!important}
+  .join-modal-body-v25{padding:10px 12px 12px!important}
+  .profile-brand-v25 img{width:96px}
+  .room-grid-v15{
+    grid-template-columns:minmax(0,79%) minmax(82px,21%) !important;
+  }
+  .room-mini-avatar-v15{width:18px!important;height:18px!important;flex-basis:18px!important}
+  .room-user-list-v15 li{gap:3px!important}
+  .emoji-grid-v23{grid-template-columns:repeat(8,1fr)!important}
+}
+
+
+/* ==========================================================
+   SOHBETIX LEGACY LAYOUT COMPATIBILITY
+   ========================================================== */
+
+/* Sağdaki çevrimiçi/arama/kullanıcı sütununu biraz daha daralt */
+html.room-fixed-viewport .room-grid-v15,
+body.room-page-v15 .room-grid-v15,
+.room-grid-v15{
+  grid-template-columns:minmax(0,1fr) clamp(105px,11vw,165px) !important;
+}
+
+/* Mesaj yaz alanı: kayıtlı/misafir fark etmeksizin Gönder sağ alt */
+.room-composer-v15{width:100%!important}
+.room-compose-actions-v15{
+  display:flex!important;
+  width:100%!important;
+  align-items:center!important;
+  justify-content:flex-start!important;
+  gap:8px!important;
+  padding-top:5px!important;
+}
+.room-profile-hint-v15{margin-right:auto!important}
+.room-send-v15{
+  margin-left:auto!important;
+  margin-right:0!important;
+  flex:0 0 auto!important;
+  align-self:flex-end!important;
+}
+
+/* Ana sayfa + özel sohbet sekmeleri */
+.room-tabs-v27{
+  display:flex!important;
+  align-items:stretch!important;
+  gap:0!important;
+  min-width:0!important;
+  overflow:hidden!important;
+  padding:0!important;
+}
+.main-chat-tab-v27{
+  flex:0 0 auto!important;
+  white-space:nowrap!important;
+}
+.private-tabs-v27{
+  display:flex;
+  align-items:stretch;
+  min-width:0;
+  flex:1 1 auto;
+  overflow-x:auto;
+  overflow-y:hidden;
+  scrollbar-width:thin;
+  -webkit-overflow-scrolling:touch;
+}
+.private-tab-v27{
+  flex:0 0 auto;
+  display:flex;
+  align-items:center;
+  min-width:118px;
+  max-width:190px;
+  height:100%;
+  border-left:1px solid #ccd6dd;
+  background:#f3f5f6;
+}
+.private-tab-v27.active{background:#49a4cc;color:#fff}
+.private-tab-open-v27{
+  flex:1 1 auto;min-width:0;height:100%;border:0;background:transparent;color:inherit;
+  display:flex;align-items:center;gap:6px;padding:5px 6px;font:800 11px/1.1 inherit;cursor:pointer;
+}
+.private-tab-open-v27>span:last-child{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+.private-tab-avatar-v27{
+  width:22px;height:22px;flex:0 0 22px;display:grid;place-items:center;
+  border-radius:4px;background:#ffd642;border:1px solid #e0b91f;color:var(--user-color,#222);font-weight:900;
+}
+.private-tab-close-v27{
+  width:26px;height:100%;border:0;background:transparent;color:inherit;
+  font-size:18px;line-height:1;cursor:pointer;opacity:.8;
+}
+.private-tab-close-v27:hover{opacity:1;background:rgba(0,0,0,.08)}
+.private-message-v27{background:rgba(73,164,204,.04)}
+.private-empty-v27{
+  margin:14px;padding:14px;border:1px dashed #cbd5dc;border-radius:8px;
+  color:#64707b;font-size:12px;text-align:center;
+}
+.private-empty-v27 strong{color:#1985b3}
+.private-empty-v27 span{font-size:11px}
+
+/* Profil tam sayfa */
+.profile-page-v27{
+  margin:0;min-height:100vh;background:#fff;color:#333;font-family:Arial,Helvetica,sans-serif;
+  display:flex;flex-direction:column;
+}
+.profile-topbar-v27{
+  height:38px;background:#4ca3cc;display:flex;align-items:center;padding:0 max(10px,calc((100vw - 1040px)/2));
+}
+.profile-brand-link-v27{color:#fff;text-decoration:none;font-size:13px;font-weight:800}
+.profile-shell-v27{
+  width:min(1040px,calc(100% - 24px));margin:20px auto;display:grid;
+  grid-template-columns:190px 220px minmax(0,1fr);gap:20px;align-items:start;flex:1;
+}
+.profile-side-v27{
+  display:flex;flex-direction:column;background:#f7f7f7;border:1px solid #eee;padding:8px 0;
+}
+.profile-side-v27 a,.profile-side-v27 button{
+  border:0;background:transparent;color:#247fa8;text-decoration:none;text-align:left;
+  padding:11px 14px;font:600 12px/1.2 Arial;cursor:pointer;
+}
+.profile-side-v27 .active{background:#4ca3cc;color:#fff;margin:0 8px;border-radius:2px}
+.profile-side-v27 a:last-child{margin-top:12px;border-top:1px solid #e4e4e4;padding-top:18px}
+.profile-photo-col-v27{text-align:center}
+.profile-photo-v27{
+  width:220px;height:270px;background:#050505;display:grid;place-items:center;overflow:hidden;margin:0 auto;
+}
+.profile-photo-v27 img{width:78%;height:78%;object-fit:contain}
+.profile-photo-change-v27,.profile-edit-btn-v27{
+  border:0;color:#fff;padding:8px 12px;margin-top:10px;border-radius:2px;font-weight:700;font-size:11px;cursor:pointer;
+}
+.profile-photo-change-v27{background:#58b86a}
+.profile-edit-btn-v27{background:#4ca3cc;display:block;margin-left:auto;margin-right:auto}
+.profile-info-v27{padding-top:4px}
+.profile-name-row-v27{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.profile-name-row-v27 strong{color:#d32929;font-size:14px}
+.profile-online-v27{background:#58ba67;color:#fff;font-size:9px;font-weight:800;padding:3px 6px;border-radius:2px}
+.profile-online-v27.offline{background:#9aa3aa}
+.profile-about-v27{margin-top:22px;font-size:12px}
+.profile-about-v27 h3{font-size:12px;font-weight:400;margin:0 0 24px;color:#555}
+.profile-about-v27 p{white-space:pre-wrap;line-height:1.7}
+.profile-note-v27{margin-top:25px;font-size:12px;line-height:1.7}
+.profile-footer-v27{
+  border-top:1px solid #e6e6e6;background:#f6f6f6;padding:8px 14px;display:flex;justify-content:space-between;
+  color:#666;font-size:10px;
+}
+.profile-footer-v27 select{font-size:10px}
+.profile-dialog-backdrop-v27{
+  position:fixed;inset:0;background:rgba(0,0,0,.48);z-index:9999;display:grid;place-items:center;padding:14px;
+}
+.profile-dialog-backdrop-v27[hidden]{display:none!important}
+.profile-dialog-v27{
+  width:min(420px,100%);background:#fff;border-radius:6px;box-shadow:0 18px 50px rgba(0,0,0,.3);padding:14px;
+}
+.profile-dialog-v27 header{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+.profile-dialog-v27 header button{border:0;background:transparent;font-size:22px;cursor:pointer}
+.profile-dialog-v27 label{font-size:12px;font-weight:700}
+.profile-dialog-v27 textarea{width:100%;box-sizing:border-box;margin-top:6px;border:1px solid #cbd3d9;border-radius:4px;padding:8px;font:12px Arial;resize:vertical}
+.profile-dialog-v27>button{margin-top:8px;border:0;background:#4ca3cc;color:#fff;border-radius:4px;padding:8px 15px;font-weight:700;cursor:pointer}
+.ignored-list-v27{display:grid;gap:6px;font-size:12px}
+.ignored-list-v27>div{padding:8px;background:#f5f7f8;border-radius:4px}
+
+/* Mobilde sohbet alanı olabildiğince geniş kalsın */
+@media(max-width:760px){
+  html.room-fixed-viewport .room-grid-v15,
+  body.room-page-v15 .room-grid-v15,
+  .room-grid-v15{
+    grid-template-columns:minmax(0,1fr) clamp(76px,18vw,96px) !important;
+  }
+  .room-online-v15{font-size:9px!important;padding:0 4px!important}
+  .room-search-v15{padding:4px!important}
+  .room-search-v15 input{font-size:9px!important;padding:0 4px!important}
+  .room-user-list-v15 b{font-size:9.5px!important}
+  .private-tab-v27{min-width:106px;max-width:150px}
+  .private-tab-open-v27{font-size:10px;padding:4px}
+  .profile-shell-v27{
+    width:100%;margin:0;grid-template-columns:1fr;gap:12px;padding:12px;box-sizing:border-box;
+  }
+  .profile-side-v27{
+    display:grid;grid-template-columns:repeat(3,1fr);gap:4px;background:#fff;border:0;padding:0;
+  }
+  .profile-side-v27 a,.profile-side-v27 button{
+    border:1px solid #e2e6e8!important;border-radius:4px!important;margin:0!important;padding:9px 6px!important;text-align:center!important;font-size:10px!important;
+  }
+  .profile-side-v27 .active{background:#4ca3cc!important;color:#fff!important}
+  .profile-photo-v27{width:min(260px,82vw);height:min(310px,96vw)}
+  .profile-info-v27{padding:4px 6px 20px}
+  .profile-topbar-v27{height:34px;padding:0 10px}
+}
+
+
+/* ==========================================================
+   SOHBETIX LEGACY PRIVATE TAB COMPATIBILITY
+   ========================================================== */
+.room-tabs-v15.room-tabs-v27{
+  height:48px!important;
+  padding:6px 8px!important;
+  gap:8px!important;
+  background:#f5f5f5!important;
+  border-bottom:1px solid #d9d9d9!important;
+  overflow:hidden!important;
+}
+.main-chat-tab-v27{
+  height:36px!important;
+  border-radius:0!important;
+  background:#4fa4ca!important;
+  color:#fff!important;
+  padding:0 18px!important;
+  font-size:13px!important;
+  font-weight:500!important;
+  box-shadow:none!important;
+}
+.private-tabs-v27{
+  display:flex!important;
+  gap:8px!important;
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  flex:1 1 auto!important;
+  min-width:0!important;
+  align-items:center!important;
+  scrollbar-width:thin!important;
+  scroll-behavior:smooth!important;
+}
+.private-tab-v27{
+  flex:0 0 auto!important;
+  min-width:150px!important;
+  max-width:220px!important;
+  height:36px!important;
+  border:0!important;
+  background:#ececec!important;
+  color:#111!important;
+  display:flex!important;
+  align-items:center!important;
+}
+.private-tab-v27.active{
+  background:#e9e9e9!important;
+  color:#111!important;
+}
+.private-tab-open-v27{
+  height:36px!important;
+  padding:0 7px!important;
+  gap:8px!important;
+  font-size:13px!important;
+  font-weight:500!important;
+}
+.private-tab-avatar-v27{
+  width:24px!important;
+  height:24px!important;
+  flex:0 0 24px!important;
+  border:1px solid #c5d0d6!important;
+  border-radius:3px!important;
+  background:#fff!important;
+  display:grid!important;
+  place-items:center!important;
+  color:#4c93b6!important;
+}
+.private-tab-avatar-v27 svg{
+  width:19px!important;
+  height:19px!important;
+  fill:#4c93b6!important;
+  stroke:#4c93b6!important;
+  stroke-width:1.4!important;
+}
+.private-tab-close-v27{
+  width:28px!important;
+  height:28px!important;
+  margin-right:5px!important;
+  border-radius:50%!important;
+  background:#d3d3d3!important;
+  color:#666!important;
+  font-size:19px!important;
+  font-weight:500!important;
+  display:grid!important;
+  place-items:center!important;
+}
+.private-tab-close-v27:hover{
+  background:#c5c5c5!important;
+  color:#333!important;
+}
+@media(max-width:760px){
+  .room-tabs-v15.room-tabs-v27{
+    height:46px!important;
+    padding:5px 6px!important;
+    gap:6px!important;
+  }
+  .main-chat-tab-v27{
+    height:36px!important;
+    padding:0 13px!important;
+    font-size:12px!important;
+  }
+  .private-tab-v27{
+    min-width:132px!important;
+    max-width:175px!important;
+    height:36px!important;
+  }
+  .private-tab-open-v27{font-size:12px!important;gap:6px!important}
+  .private-tab-avatar-v27{width:22px!important;height:22px!important;flex-basis:22px!important}
+  .private-tab-close-v27{width:25px!important;height:25px!important;margin-right:4px!important}
+}
+
+/* ==========================================================
+   SOHBETIX V28
+   ========================================================== */
+.user-avatar-v28{position:relative;width:38px;height:38px;flex:0 0 38px;border:2px solid #e4b91e;border-radius:8px;background:linear-gradient(#ffe36b,#ffc928);display:grid;place-items:center;overflow:visible;font-size:19px;font-weight:900;color:#27323a;box-sizing:border-box}
+.user-avatar-v28 img{width:100%;height:100%;object-fit:cover;border-radius:5px;display:block}.user-avatar-v28.vip{border-color:#d89a00;box-shadow:0 0 0 2px #ffe08a inset,0 0 8px rgba(214,155,0,.35)}.user-avatar-v28 i{position:absolute;right:-6px;top:-8px;font-style:normal;font-size:12px;color:#d79c00;text-shadow:0 1px #fff}.room-mini-avatar-v15.user-avatar-v28{width:24px!important;height:24px!important;flex-basis:24px!important;font-size:13px!important;border-radius:5px!important}.room-mini-avatar-v15.user-avatar-v28 img{border-radius:3px}.vip-user-v28 .vip-crown-v28{font-size:8px;background:#d6a000;color:#fff;border-radius:3px;padding:2px 3px;margin-left:auto}.sohbetix-user-menu-head-v20 .user-avatar-v28{width:34px;height:34px;flex-basis:34px}
+
+/* V28 yatay kaydırmalı özel sohbet sekmeleri */
+.room-tabs-v28{display:flex!important;align-items:stretch!important;gap:0!important;overflow:hidden!important;min-width:0!important;padding:0!important;background:#f3f3f3!important;border-bottom:1px solid #d6d6d6}.main-chat-tab-v28{flex:0 0 auto!important;background:#4da4ce!important;color:#fff!important;border:0!important;border-radius:0!important;padding:10px 18px!important;min-height:44px!important;font-size:14px!important}.main-chat-tab-v28.active{background:#318fbd!important}.private-tabs-v28{display:flex;flex:1 1 auto;min-width:0;overflow-x:auto;overflow-y:hidden;scrollbar-width:thin;-webkit-overflow-scrolling:touch}.private-tab-v28{flex:0 0 auto;display:flex;align-items:center;min-width:132px;max-width:210px;background:#ececec;border-left:1px solid #fff;border-right:1px solid #d8d8d8}.private-tab-v28.active{background:#50a6cf}.private-tab-open-v28{display:flex;align-items:center;gap:7px;min-width:0;flex:1;height:100%;padding:7px 8px;border:0;background:transparent;color:#111;font-weight:700;cursor:pointer}.private-tab-v28.active .private-tab-open-v28{color:#fff}.private-tab-avatar-v28{width:25px;height:25px;flex:0 0 25px;border:2px solid #e4b91e;border-radius:5px;background:#ffdb3c;display:grid;place-items:center;font-size:12px}.private-tab-open-v28 span:last-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.private-tab-close-v28{width:34px;height:100%;min-height:44px;border:0;background:#d8d8d8;color:#555;font-size:20px;cursor:pointer}.private-tab-v28.active .private-tab-close-v28{background:rgba(0,0,0,.08);color:#fff}.private-empty-v28{padding:18px;color:#64717b;text-align:center;font-size:12px}.private-message-v28{background:rgba(78,166,207,.04)}
+
+/* Profile */
+.profile-page-v28,.profile-edit-page-v28,.vip-page-v28,.vip-info-page-v28,.members-page-v28{margin:0;min-height:100vh;background:#fff;color:#303840;font-family:Arial,Helvetica,sans-serif}.profile-topbar-v28{height:60px;background:#4fa6cf;display:flex;align-items:center;justify-content:space-between;padding:0 max(18px,calc((100vw - 1100px)/2));box-sizing:border-box}.profile-topbar-v28 a{color:#fff;text-decoration:none;font-weight:800}.profile-layout-v28{width:min(1100px,calc(100% - 28px));margin:22px auto;display:grid;grid-template-columns:190px 300px minmax(0,1fr);gap:26px;align-items:start}.profile-side-v28{display:flex;flex-direction:column;background:#f7f8f9;border:1px solid #edf0f2;border-radius:4px;padding:8px}.profile-side-v28 a,.profile-side-v28 button{display:flex;align-items:center;gap:5px;text-align:left;padding:11px 12px;border:0;background:transparent;color:#257da6;text-decoration:none;font:600 13px Arial;cursor:pointer;border-radius:4px}.profile-side-v28 a.active{background:#4da4ce;color:#fff}.profile-side-v28 img{width:14px;height:14px;object-fit:contain}.profile-main-v28{text-align:center}.profile-photo-wrap-v28{width:100%;aspect-ratio:1/1.12;background:#f4f6f7;border:1px solid #e5e9ec;border-radius:6px;overflow:hidden;display:grid;place-items:center}.profile-photo-wrap-v28 img{width:100%;height:100%;object-fit:cover;display:block;background:#fff}.profile-actions-v28{display:flex;flex-direction:column;align-items:center;gap:8px;margin-top:10px}.profile-actions-v28 button{border:0;color:#fff;font-weight:800;border-radius:4px;padding:9px 12px;cursor:pointer}.profile-actions-v28 .green{background:#55b66d}.profile-actions-v28 .blue{background:#438fc0}.profile-info-v28{padding-top:4px}.profile-name-row-v28{display:flex;gap:8px;align-items:center;flex-wrap:wrap}.profile-name-row-v28 strong{font-size:22px;color:#b32b2b}.profile-vip-badge-v28{background:#d6a000;color:#fff;font-weight:900;font-size:10px;padding:4px 6px;border-radius:4px}.profile-online-v28{background:#4eb86a;color:#fff;font-size:10px;font-weight:900;padding:4px 7px;border-radius:3px}.profile-online-v28.offline{background:#99a1a8}.profile-facts-v28{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px;margin:22px 0}.profile-facts-v28>div{background:#f6f8f9;border:1px solid #e6eaed;border-radius:6px;padding:10px}.profile-facts-v28 dt{font-size:11px;color:#7a858e}.profile-facts-v28 dd{margin:5px 0 0;font-weight:700}.profile-about-v28 h3{font-size:13px;font-weight:600;color:#666}.profile-about-v28 p{white-space:pre-wrap;line-height:1.65;overflow-wrap:anywhere}.profile-footer-v28{border-top:1px solid #e7eaec;background:#f8f9fa;display:flex;justify-content:space-between;padding:10px 16px;font-size:11px}.profile-modal-v28{position:fixed;inset:0;background:rgba(0,0,0,.46);z-index:9999;display:grid;place-items:center;padding:16px}.profile-modal-v28[hidden]{display:none!important}.profile-modal-v28>section{width:min(430px,100%);background:#fff;border-radius:9px;padding:14px;box-shadow:0 20px 50px rgba(0,0,0,.25)}.profile-modal-v28 header{display:flex;justify-content:space-between;align-items:center}.profile-modal-v28 header button{border:0;background:transparent;font-size:24px}.ignored-row-v28{display:flex;justify-content:space-between;align-items:center;padding:10px;background:#f4f6f7;border-radius:5px;margin-top:7px}.ignored-row-v28 button{border:0;background:#b80000;color:#fff;border-radius:4px;padding:6px 8px}
+
+/* Profile edit */
+.profile-edit-shell-v28{width:min(700px,calc(100% - 28px));margin:24px auto 80px}.profile-back-v28{color:#2180ae;text-decoration:none}.profile-edit-shell-v28 form{display:grid;gap:17px;margin-top:18px}.profile-edit-shell-v28 label,.profile-edit-shell-v28 fieldset{display:grid;gap:7px;font-weight:800;font-size:13px;border:0;padding:0;margin:0}.profile-edit-shell-v28 input:not([type=checkbox]):not([type=color]),.profile-edit-shell-v28 select,.profile-edit-shell-v28 textarea{width:100%;box-sizing:border-box;border:1px solid #c8d0d6;border-radius:5px;padding:10px;font:14px Arial;background:#fff}.profile-edit-shell-v28 input:disabled{background:#eceeef;color:#727a80}.profile-edit-shell-v28 small{font-weight:400;color:#777}.date-row-v28{display:grid;grid-template-columns:1fr 1.3fr 1fr;gap:7px}.color-row-v28{display:flex;gap:8px}.color-row-v28 input[type=color]{width:52px;height:42px;padding:2px;border:1px solid #ccd3d8;background:#fff;border-radius:5px}.color-row-v28 input[type=text],.color-row-v28 input:not([type]){flex:1}.vip-check-v28,.privacy-check-v28{display:flex!important;align-items:center!important;grid-template-columns:auto 1fr!important;gap:8px!important}.vip-check-v28 b{background:#f0b226;color:#fff;font-size:9px;border-radius:3px;padding:3px 5px}.save-profile-v28{justify-self:start;border:0;background:#438fc0;color:#fff;border-radius:4px;padding:10px 15px;font-weight:800;cursor:pointer}.profile-edit-status-v28{color:#118246;font-weight:700}.delete-profile-v28{justify-self:start;border:1px solid #d0d0d0;background:#f2f2f2;padding:8px 10px;border-radius:3px;color:#a41414;cursor:pointer}.profile-edit-shell-v28 hr{width:100%;border:0;border-top:1px solid #e6e6e6}
+
+/* VIP */
+.vip-shell-v28{width:min(940px,calc(100% - 30px));margin:26px auto 70px}.vip-content-v28{max-width:820px}.vip-logo-v28{width:120px;height:70px;object-fit:contain}.vip-content-v28 h1{font-size:25px}.vip-features-v28{list-style:none;padding:0;display:grid;gap:11px;font-size:14px}.vip-buy-main-v28{border:0;background:#50b367;color:#fff;font-weight:800;padding:11px 18px;border-radius:4px;cursor:pointer}.vip-faq-v28{margin-top:28px;line-height:1.6}.vip-faq-v28 h2{margin-top:0}.vip-faq-v28 h3{font-size:14px;margin-bottom:4px}.vip-faq-v28 p{font-size:13px;margin-top:0}.vip-info-link-v28{display:inline-block;color:#1979a8;font-weight:700;text-decoration:underline;margin:4px 0 15px}.vip-modal-v28{position:fixed;inset:0;background:rgba(0,0,0,.48);display:grid;place-items:center;z-index:9999;padding:16px}.vip-modal-v28[hidden]{display:none!important}.vip-modal-v28>section{width:min(360px,100%);background:#fff;border-radius:12px;padding:14px;box-shadow:0 25px 60px rgba(0,0,0,.3)}.vip-modal-v28 header{display:flex;justify-content:space-between;align-items:center}.vip-modal-v28 header button{border:0;background:transparent;font-size:24px}.vip-balance-v28{display:flex;align-items:center;gap:6px;margin:10px 0;font-weight:800}.vip-balance-v28 img,.vip-plan-v28 img{width:20px;height:20px;object-fit:contain}.vip-plan-v28{position:relative;width:100%;border:1px solid #d8dfe4;background:#fff;border-radius:9px;padding:18px 14px;margin:8px 0;display:grid;gap:5px;text-align:center;cursor:pointer}.vip-plan-v28 strong{font-size:21px;color:#344658}.vip-plan-v28 span{display:flex;align-items:center;justify-content:center;gap:5px;color:#6a7680}.vip-plan-v28 i{position:absolute;right:-5px;top:-8px;background:#ef5350;color:#fff;padding:5px;border-radius:12px;font-style:normal;font-size:10px}.vip-coins-link-v28{border:0;background:#438fc0;color:#fff;padding:8px 12px;border-radius:4px}.vip-info-shell-v28{width:min(800px,calc(100% - 30px));margin:28px auto 80px;line-height:1.75}.vip-info-shell-v28>img{width:150px}.vip-info-shell-v28 h1{font-size:27px}.vip-info-shell-v28 h2{font-size:18px;color:#287da5}.vip-info-cta-v28{display:inline-block;background:#4da4ce;color:#fff;text-decoration:none;padding:10px 14px;border-radius:4px;font-weight:800}
+
+/* Members */
+.members-shell-v28{width:min(1000px,calc(100% - 24px));margin:18px auto 70px;display:grid;grid-template-columns:190px 1fr;gap:24px}.members-filter-v28{background:#f6f7f8;border:1px solid #edf0f2;padding:8px;display:flex;flex-direction:column;gap:4px;align-self:start}.members-filter-v28>a{padding:10px;color:#217aa5;text-decoration:none;font-size:12px}.members-filter-v28>a.active{background:#438fc0;color:#fff;border-radius:3px}.members-filter-v28 label{display:grid;gap:5px;font-size:12px;font-weight:700;margin-top:7px}.members-filter-v28 select,.members-filter-v28 input[type=text],.members-filter-v28 input[type=number],#filterNickV28{width:100%;box-sizing:border-box;border:1px solid #c9d0d5;padding:7px;background:#fff}.members-filter-v28 .check{display:flex;align-items:center;gap:5px;font-weight:400;margin-top:3px}.members-filter-v28 .disabled{opacity:.55}.age-row-v28{display:flex;align-items:center;gap:4px}.members-filter-v28 button{border:0;background:#54b56d;color:#fff;padding:8px;border-radius:3px;align-self:start;margin-top:7px}.members-count-v28{font-size:12px;margin-bottom:10px}.member-card-v28{display:grid;grid-template-columns:120px 1fr;gap:14px;padding:12px 0;border-bottom:1px solid #eee;text-decoration:none;color:#333}.member-photo-v28{width:120px;height:120px;background:#f0f0f0;display:grid;place-items:center;overflow:hidden}.member-photo-v28 img{width:100%;height:100%;object-fit:cover}.member-photo-v28 span{font-size:40px;opacity:.25}.member-meta-v28{display:flex;align-items:flex-start;gap:6px;flex-wrap:wrap;padding-top:4px}.member-meta-v28 strong{font-size:13px}.member-online-v28{background:#53b267;color:#fff;font-size:8px;font-weight:800;padding:3px 5px;border-radius:2px}.member-vip-v28{background:#d4a000;color:#fff;font-size:8px;padding:3px 5px;border-radius:2px}.member-meta-v28 small{flex-basis:100%;color:#777}
+
+@media(max-width:760px){.profile-layout-v28{width:100%;margin:0;display:grid;grid-template-columns:1fr;gap:14px;padding:12px;box-sizing:border-box}.profile-side-v28{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:#fff;border:0}.profile-side-v28 a,.profile-side-v28 button{border:1px solid #e0e5e8!important;text-align:center!important;justify-content:center!important;padding:10px 5px!important;font-size:11px!important}.profile-photo-wrap-v28{width:min(100%,520px);margin:auto;aspect-ratio:1/1}.profile-info-v28{padding:0 10px 25px}.profile-facts-v28{grid-template-columns:1fr 1fr}.members-shell-v28{grid-template-columns:1fr}.members-filter-v28{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:7px}.members-filter-v28>a{border:1px solid #e1e5e8;border-radius:3px;text-align:center}.members-filter-v28 label,.members-filter-v28 button{margin:0}.member-card-v28{grid-template-columns:90px 1fr}.member-photo-v28{width:90px;height:90px}.room-tabs-v28{min-height:43px}.main-chat-tab-v28{padding:8px 13px!important;font-size:12px!important}.private-tab-v28{min-width:118px;max-width:155px}.private-tab-open-v28{font-size:11px}.profile-topbar-v28{height:52px;padding:0 14px}}
+
+/* V28 chat son yerleşim */
+html.room-fixed-viewport .room-grid-v15,body.room-page-v15 .room-grid-v15,.room-grid-v15{grid-template-columns:minmax(0,1fr) clamp(90px,10vw,145px)!important}
+.room-photo-v28{border:0;background:transparent;font-size:20px;cursor:pointer;padding:5px 7px;line-height:1}.room-photo-v28:hover{background:#eef2f5;border-radius:5px}
+@media(max-width:760px){html.room-fixed-viewport .room-grid-v15,body.room-page-v15 .room-grid-v15,.room-grid-v15{grid-template-columns:minmax(0,1fr) clamp(72px,17vw,88px)!important}.room-photo-v28{font-size:18px;padding:4px}}
+.user-avatar-v28.guest{border-color:#c7cdd2;background:#eef1f3;color:#37434b}.user-avatar-v28.registered{border-color:#e4b91e}
+
+
+/* ==========================================================
+   SOHBETIX V29 — VIP SIRALAMA / DURUM / MESAJ SECME / PROFIL
+   ========================================================== */
+
+/* Kayıtlı kullanıcı artık otomatik altın çerçeveli değil; yalnız VIP altın. */
+.user-avatar-v28,
+.user-avatar-v28.registered,
+.user-avatar-v28.guest{
+  border-color:#c8d0d7!important;
+  background:#eef2f5!important;
+  box-shadow:none!important;
+  color:#34424e!important;
+}
+.user-avatar-v28.vip{
+  border-color:#d79a00!important;
+  background:linear-gradient(#ffe36b,#ffc928)!important;
+  box-shadow:0 0 0 2px #ffe08a inset,0 0 8px rgba(214,155,0,.35)!important;
+}
+.user-avatar-v28.vip img{border-radius:3px}
+
+/* Kullanıcı listesi ve profil tarafı hafif büyütüldü. */
+.room-user-list-v15 li{
+  min-height:32px!important;
+  gap:6px!important;
+  padding:6px 4px!important;
+}
+.room-user-list-v15 b{
+  font-size:12px!important;
+  line-height:1.18!important;
+}
+.room-mini-avatar-v15.user-avatar-v28{
+  width:27px!important;
+  height:27px!important;
+  flex-basis:27px!important;
+  font-size:14px!important;
+}
+.sohbetix-user-menu-head-v20 strong{font-size:14px!important}
+.sohbetix-user-menu-v20 button{font-size:13px!important}
+
+/* Online / Bir yana / Meşgul menüsü */
+.room-account-icon-v29,
+.status-menu-icon-v29{
+  position:relative;
+  display:inline-grid;
+  place-items:center;
+  width:25px;
+  height:25px;
+  flex:0 0 25px;
+  color:#26749a;
+}
+.room-account-icon-v29 svg,
+.status-menu-icon-v29 svg{
+  width:21px;height:21px;fill:#e7f4fb;stroke:#26749a;stroke-width:1.8;
+}
+.room-account-icon-v29 i,
+.status-menu-icon-v29 i{
+  position:absolute;right:-1px;bottom:0;width:8px;height:8px;border:2px solid #fff;border-radius:50%;background:#41b95d;
+}
+.room-account-icon-v29[data-status="away"] i,
+.status-menu-icon-v29.away i{background:#9aa5ae}
+.room-account-icon-v29[data-status="busy"] i,
+.status-menu-icon-v29.busy i{
+  background:#d83b3b;
+}
+.room-account-icon-v29[data-status="busy"] i::after,
+.status-menu-icon-v29.busy i::after{
+  content:"";position:absolute;left:1px;right:1px;top:3px;height:2px;background:#fff;border-radius:2px;
+}
+.room-account-menu-v29{width:170px!important;padding:5px!important}
+.room-account-menu-v29 .room-status-option-v29{
+  display:flex!important;align-items:center!important;gap:7px!important;
+  color:#26343e!important;font-weight:700!important;
+}
+.room-account-menu-v29 .room-status-option-v29.active{background:#eef7fb!important;color:#12698f!important}
+.room-status-separator-v29{height:1px;background:#e1e7eb;margin:4px 2px}
+.room-account-menu-v29 .leave-room-v29{color:#9a1111!important}
+
+/* Kullanıcı listesinde durum işareti */
+.presence-status-v29{
+  position:relative;width:10px;height:10px;flex:0 0 10px;margin-left:-8px;margin-right:-1px;margin-top:16px;
+  border:2px solid #fff;border-radius:50%;background:#42b95d;z-index:2;
+}
+.presence-status-v29.away{background:#9aa5ae}
+.presence-status-v29.busy{background:#d83b3b}
+.presence-status-v29.busy::after{
+  content:"";position:absolute;left:1px;right:1px;top:3px;height:2px;background:#fff;border-radius:2px;
+}
+
+/* Kullanıcının sadece kendi mesajlarında seçim kutusu */
+.live-message-v15{position:relative;padding-right:34px}
+.own-message-select-wrap-v29{
+  position:absolute;right:7px;top:50%;transform:translateY(-50%);
+  width:20px;height:20px;display:grid;place-items:center;cursor:pointer;
+}
+.own-message-select-v29{
+  width:15px;height:15px;accent-color:#4fa6cf;cursor:pointer;
+}
+.message-selection-menu-v29{
+  position:absolute;left:50%;bottom:88px;transform:translateX(-50%);
+  z-index:90;background:#fff;border:1px solid #aeb9c1;box-shadow:0 6px 18px rgba(0,0,0,.18);
+  min-width:128px;padding:0;
+}
+.message-selection-menu-v29[hidden]{display:none!important}
+.message-selection-menu-v29 button{
+  display:block;width:100%;border:0;background:#fff;text-align:center;padding:8px 12px;
+  font:700 12px Arial;cursor:pointer;color:#222;
+}
+.message-selection-menu-v29 button:first-child{background:#eaf6ff}
+.message-selection-menu-v29 button+button{border-top:1px solid #d8e0e5}
+
+/* Etiket sadece etiketlenen kullanıcının ekranında vurgulu görünür. */
+.mention-tag-v29{
+  color:#137eaa!important;
+  font-weight:900!important;
+  text-decoration:none!important;
+}
+.message-mentions-me-v29{
+  background:#fff3c9!important;
+  border-radius:3px;
+}
+
+/* Profil footer PC'de gerçek sayfa altına sabitlenir. */
+.profile-page-v28{
+  min-height:100vh!important;
+  display:flex!important;
+  flex-direction:column!important;
+}
+.profile-layout-v28{
+  flex:1 0 auto!important;
+}
+.profile-footer-v28{
+  margin-top:auto!important;
+  flex:0 0 auto!important;
+}
+
+/* Gizli sohbet sekmeleri yatay kaydırma korunur */
+.private-tabs-v28{
+  overflow-x:auto!important;
+  overflow-y:hidden!important;
+  scroll-behavior:smooth;
+  -webkit-overflow-scrolling:touch;
+}
+
+/* Mobil uyum */
+@media(max-width:760px){
+  .room-user-list-v15 b{font-size:11px!important}
+  .room-mini-avatar-v15.user-avatar-v28{
+    width:25px!important;height:25px!important;flex-basis:25px!important;font-size:13px!important;
+  }
+  .presence-status-v29{width:9px;height:9px;flex-basis:9px;margin-left:-8px;margin-top:15px}
+  .message-selection-menu-v29{bottom:82px;min-width:122px}
+  .room-account-menu-v29{width:158px!important}
+}
+
+/* ==============================================================
+   SOHBETIX V29 — MOR / LACIVERT DESEN TEMA FIX
+   Referans ana renk: #4B1D9A
+   =============================================================== */
+:root{
+  --bg:#f5f6f9!important;
+  --surface:#ffffff!important;
+  --surface-2:#f7f8fb!important;
+  --surface-3:#eef0f6!important;
+  --text:#171827!important;
+  --muted:#6c7080!important;
+  --line:#dfe2eb!important;
+  --brand:#4B1D9A!important;
+  --brand-2:#6A2BD4!important;
+  --blue:#4B1D9A!important;
+  --blue-2:#6A2BD4!important;
+}
+
+/* Referanstaki koyu lacivert + mor çapraz desen. */
+.topbar,.admin-top,.dash-top,.control-topbar,.profile-topbar-v28,.room-titlebar-v15{
+  position:relative!important;
+  color:#fff!important;
+  border-bottom:2px solid #7c28e8!important;
+  background:
+    linear-gradient(128deg,transparent 0 67%,rgba(121,35,213,.10) 67.3% 69.2%,transparent 69.5% 73.2%,rgba(121,35,213,.15) 73.5% 76%,transparent 76.3% 81%,rgba(121,35,213,.18) 81.3% 84%,transparent 84.3% 100%),
+    repeating-linear-gradient(135deg,rgba(255,255,255,0) 0 30px,rgba(107,34,191,.08) 31px 37px,rgba(255,255,255,0) 38px 58px),
+    linear-gradient(100deg,#17102f 0%,#15112e 46%,#20103b 74%,#3d176f 100%)!important;
+  box-shadow:0 1px 0 rgba(75,29,154,.55),0 4px 14px rgba(23,16,47,.12)!important;
+  backdrop-filter:none!important;
+}
+.topbar::after,.admin-top::after,.dash-top::after,.control-topbar::after,.profile-topbar-v28::after,.room-titlebar-v15::after{
+  content:"";
+  position:absolute;inset:0 0 0 auto;width:min(34vw,360px);pointer-events:none;opacity:.72;
+  background:
+    linear-gradient(132deg,transparent 0 45%,rgba(124,35,229,.18) 46% 50%,transparent 51% 57%,rgba(124,35,229,.22) 58% 62%,transparent 63% 100%),
+    linear-gradient(132deg,transparent 0 61%,rgba(77,25,151,.34) 62% 68%,transparent 69% 100%);
+}
+.topbar>*,.admin-top>*,.dash-top>*,.control-topbar>*,.profile-topbar-v28>*,.room-titlebar-v15>*{position:relative;z-index:1}
+
+/* Masaüstü ana navigasyon beyaz yazı. */
+.brand,.brand span,.nav nav>a,.more-btn,.control,.admin-nav-link,.dash-tab,.control-tab,
+.profile-topbar-v28 a,.room-title-btn-v15,.room-account-v15>button{
+  color:#fff!important;
+}
+.nav nav>a:hover,.more-btn:hover,.admin-nav-link:hover,.dash-tab:hover,.control-tab:hover{
+  color:#fff!important;background:rgba(255,255,255,.10)!important;
+}
+.control{border-color:rgba(255,255,255,.25)!important;background:rgba(255,255,255,.08)!important}
+.control:hover{background:rgba(255,255,255,.15)!important}
+
+/* Logo görsellerinin beyaz kutu gibi görünmesini önler, kendi logo içeriğini bozmaz. */
+.topbar .brand-logo-v21,.admin-top .brand-logo-v21,.dash-top .brand-logo-v21,.control-topbar .brand-logo-v21{
+  background:rgba(255,255,255,.94)!important;border-radius:8px!important;padding:3px 6px!important;
+}
+
+/* Chat üst bar: referanstaki kompakt görünüm. */
+.room-titlebar-v15{min-height:58px!important;height:58px!important;padding:0 18px!important}
+.room-title-btn-v15,.room-account-v15>button{font-size:18px!important;font-weight:900!important;text-shadow:0 1px 2px rgba(0,0,0,.22)}
+.room-account-icon-v29 svg{fill:#f2ebff!important;stroke:#fff!important}
+
+/* Chat gövdesi ve sağ kullanıcı alanı referanstaki açık gri-beyaz ton. */
+.room-page-v15,.room-shell-v15,.room-card-v15{background:#fff!important}
+.room-grid-v15{background:#fff!important}
+.room-chat-v15{background:#fff!important}
+.room-users-v15{background:#f7f8fb!important;border-color:#dfe2eb!important}
+.room-online-v15,.room-search-v15{background:#f8f9fc!important;border-color:#dfe2eb!important}
+.room-search-v15 input{background:#fff!important;border-color:#d9dce6!important}
+.room-search-v15 input:focus{border-color:#4B1D9A!important;box-shadow:0 0 0 2px rgba(75,29,154,.12)!important}
+.room-messages-v15{background:#fff!important}
+.room-composer-v15,.room-guest-footer-v15{background:#f6f7fb!important;border-color:#dfe2eb!important}
+.room-compose-box-v15 textarea{background:#fff!important;border-color:#cfd3df!important}
+.room-compose-box-v15 textarea:focus{border-color:#4B1D9A!important;box-shadow:0 0 0 2px rgba(75,29,154,.08)!important}
+
+/* Referanstaki mor aktif sekme ve yatay gizli sohbet sekmeleri. */
+.room-tabs-v15,.room-tabs-v28{
+  background:#f4f5f9!important;border-color:#dfe2eb!important;
+  min-height:49px!important;height:auto!important;padding:0!important;
+}
+.room-tabs-v15 button,.main-chat-tab-v28,.private-tab-v28{
+  border-radius:0!important;border:0!important;min-height:48px!important;
+  background:#eceef4!important;color:#242532!important;
+  box-shadow:inset 0 -1px 0 #d7dae4!important;
+}
+.room-tabs-v15 button.active,.main-chat-tab-v28.active,.private-tab-v28.active{
+  color:#fff!important;
+  background:linear-gradient(135deg,#6430C9 0%,#4B1D9A 100%)!important;
+  box-shadow:inset 0 -2px 0 rgba(255,255,255,.13)!important;
+}
+.private-tab-v28{border-left:1px solid #dfe2eb!important}
+.private-tab-v28 .private-tab-close-v28{background:rgba(0,0,0,.10)!important;color:inherit!important;border-radius:50%!important}
+
+/* Tüm ana eylem butonları referanstaki mor. Başarı/online yeşilleri korunur. */
+.room-enter-v15,.room-send-v15,.join-submit-v15,
+.btn:not(.green),.blue-btn,.light-btn,.submit-auth,.auth-main-btn,.admin-save,
+.create-chat-btn,.catalog-filter-btn,.profile-actions-v28 .blue,
+.profile-side-v28 a.active,.profile-edit-save-v28,.vip-buy-v28,
+.coin-pay-btn,.domain-save-button-v18,.settings-save,.design-save,
+.sohbetix-auth-open-v21{
+  color:#fff!important;
+  border-color:#3c147d!important;
+  background:linear-gradient(135deg,#6330C9 0%,#4B1D9A 100%)!important;
+  box-shadow:0 3px 8px rgba(75,29,154,.18)!important;
+}
+.room-enter-v15:hover,.room-send-v15:hover,.join-submit-v15:hover,
+.submit-auth:hover,.auth-main-btn:hover,.create-chat-btn:hover,
+.catalog-filter-btn:hover,.profile-actions-v28 .blue:hover,.vip-buy-v28:hover{
+  background:linear-gradient(135deg,#7340DB 0%,#5521AA 100%)!important;
+}
+
+/* Mevcut yeşil sınıfını ana tema ile uyumlu mor yap; online durum rozetleri yeşil kalır. */
+.btn.green,.green:not(.profile-online-v28):not(.online),.auth-main-btn.register{
+  color:#fff!important;border-color:#3c147d!important;
+  background:linear-gradient(135deg,#6330C9,#4B1D9A)!important;
+}
+
+/* Modal başlıkları ve hesap girişleri. */
+.join-modal-title-v15,.modal-title,.dialog-title,.profile-modal-v28 header{
+  background:linear-gradient(100deg,#17102f,#4B1D9A)!important;color:#fff!important;
+}
+.join-nick-v15:focus,input:focus,textarea:focus,select:focus{outline-color:#4B1D9A!important}
+
+/* Profil / VIP / Üyeler / profil düzenleme sayfaları aynı marka görünümü. */
+.profile-page-v28,.profile-edit-page-v28,.vip-page-v28,.vip-info-page-v28,.members-page-v28{
+  background:#fff!important;color:#292a35!important;
+}
+.profile-topbar-v28{height:64px!important}
+.profile-side-v28{background:#f6f7fb!important;border-color:#e1e4ec!important}
+.profile-side-v28 a,.profile-side-v28 button{color:#4B1D9A!important}
+.profile-side-v28 a.active{color:#fff!important;background:linear-gradient(135deg,#6330C9,#4B1D9A)!important}
+.profile-actions-v28 .green{background:linear-gradient(135deg,#6330C9,#4B1D9A)!important}
+.profile-photo-wrap-v28{border-color:#e0e3eb!important;background:#fafaff!important}
+.profile-facts-v28>div,.vip-card-v28,.vip-plan-v28,.members-filter-v28,.member-card-v28{
+  background:#f8f9fc!important;border-color:#e0e3eb!important;
+}
+.profile-footer-v28{background:#f5f6fa!important;border-color:#e0e3eb!important}
+
+/* Kontrol paneli, katalog ve diğer kartlar aynı açık zemin + mor vurgu. */
+.hero,.advantages,.catalog-main,.control-main,.dash-main,.admin-main{background:#f5f6f9!important}
+.signin-card,.stats-card,.side-box,.catalog-card,.feature-grid article,.coin-purchase-card,
+.settings-card,.design-card,.admin-card,.dash-menu,.chat-select,.fast-login-box,.auth-panel{
+  background:#fff!important;border-color:#e0e3eb!important;box-shadow:0 8px 25px rgba(28,19,55,.06)!important;
+}
+.catalog-filter-btn,.catalog-category-menu button.selected{background:#4B1D9A!important;color:#fff!important}
+.more-menu,.mobile-nav-panel,.catalog-category-menu{border-color:#dddfea!important;box-shadow:0 15px 38px rgba(28,19,55,.14)!important}
+.mobile-nav-panel a,.mobile-more-toggle{color:#4B1D9A!important}
+
+/* Linkler ve küçük marka vurguları. */
+a,.profile-about-v28 a,.vip-page-v28 a,.vip-info-page-v28 a{color:#4B1D9A}
+.system-nick-v15{color:#4B1D9A!important}
+.mention-tag-v29{color:#4B1D9A!important}
+
+/* Sohbete gir butonu referans boyut/yuvarlaklık. */
+.room-enter-v15{border-radius:7px!important;padding:10px 20px!important;font-size:15px!important}
+.room-send-v15{border-radius:7px!important;padding:9px 18px!important}
+
+/* Mobilde desen ve oranlar korunur. */
+@media(max-width:760px){
+  .room-titlebar-v15{height:58px!important;min-height:58px!important;padding:0 18px!important}
+  .room-title-btn-v15,.room-account-v15>button{font-size:17px!important}
+  .room-grid-v15{min-height:calc(100vh - 58px)!important}
+  .room-tabs-v15,.room-tabs-v28{min-height:49px!important}
+  .room-tabs-v15 button,.main-chat-tab-v28,.private-tab-v28{min-height:48px!important}
+  .topbar,.admin-top,.dash-top,.control-topbar,.profile-topbar-v28{background-position:center!important}
+}
+
+
+/* ==============================================================
+   SOHBETIX V30 STATIC — MOR DESEN + AUTH / NICK / EMOJI / YOKSAY FIX
+   =============================================================== */
+.auth-page-v21{background:#f4f5f9!important;color:#171827!important}
+.auth-top-v21{
+  position:relative!important;color:#fff!important;border-bottom:2px solid #7c28e8!important;
+  background:
+    linear-gradient(128deg,transparent 0 67%,rgba(121,35,213,.11) 67.3% 69.2%,transparent 69.5% 73.2%,rgba(121,35,213,.17) 73.5% 76%,transparent 76.3% 81%,rgba(121,35,213,.20) 81.3% 84%,transparent 84.3% 100%),
+    repeating-linear-gradient(135deg,rgba(255,255,255,0) 0 30px,rgba(107,34,191,.09) 31px 37px,rgba(255,255,255,0) 38px 58px),
+    linear-gradient(100deg,#17102f 0%,#15112e 46%,#20103b 74%,#3d176f 100%)!important;
+}
+.auth-top-v21::after{content:"";position:absolute;inset:0 0 0 auto;width:min(38vw,380px);pointer-events:none;background:linear-gradient(132deg,transparent 0 45%,rgba(124,35,229,.20) 46% 50%,transparent 51% 57%,rgba(124,35,229,.24) 58% 62%,transparent 63% 100%)}
+.auth-top-v21>*{position:relative;z-index:1}.auth-back-v21{color:#fff!important;border-color:rgba(255,255,255,.45)!important;background:rgba(255,255,255,.06)!important}.auth-back-v21:hover{background:rgba(255,255,255,.14)!important}
+.auth-tabs-v21 button.active,.auth-submit-v21{background:linear-gradient(135deg,#6330C9,#4B1D9A)!important;border-color:#3c147d!important;color:#fff!important;box-shadow:0 4px 12px rgba(75,29,154,.18)!important}
+.auth-icon-v21{color:#4B1D9A!important;background:#f0eaff!important}.auth-card-v21{border-color:#dedfea!important;box-shadow:0 14px 38px rgba(27,18,55,.09)!important}.auth-form-v21 input:focus{border-color:#4B1D9A!important;box-shadow:0 0 0 3px rgba(75,29,154,.10)!important}
+
+/* 24 karakter rumuzlar sağ kullanıcı kolonunda taşmadan 1-2 satıra sığar. */
+.room-user-list-v15 li{min-width:0!important;overflow:hidden!important;align-items:flex-start!important}
+.room-user-list-v15 li>b{display:block!important;min-width:0!important;max-width:100%!important;white-space:normal!important;overflow-wrap:anywhere!important;word-break:break-word!important;line-height:1.12!important;padding-top:3px!important}
+.room-bot-user-v17 b{overflow-wrap:anywhere!important;word-break:break-word!important}
+.vip-crown-v28{flex:0 0 auto!important;margin-top:3px!important}
+
+/* Mobil emoji penceresi tamamen ekranda kalır. */
+.emoji-panel-v23{max-height:min(48vh,330px)!important;overflow:hidden!important;width:min(390px,calc(100vw - 18px))!important;max-width:100%!important}
+.emoji-grid-v23{max-height:min(40vh,270px)!important;overflow-y:auto!important;grid-template-columns:repeat(8,minmax(30px,1fr))!important;gap:3px!important;padding:7px!important;overscroll-behavior:contain!important}
+.emoji-grid-v23 button{width:100%!important;min-width:0!important;height:34px!important;font-size:22px!important;padding:0!important}
+@media(max-width:520px){.emoji-panel-v23{left:0!important;right:auto!important;bottom:calc(100% + 6px)!important;width:min(360px,calc(100vw - 16px))!important;max-height:44vh!important}.emoji-grid-v23{grid-template-columns:repeat(7,minmax(29px,1fr))!important;max-height:36vh!important}.emoji-grid-v23 button{height:32px!important;font-size:21px!important}}
+
+/* Yoksay sonrası gizlenen öğeler boşluk bırakmaz. */
+.room-user-list-v15 li[hidden],.live-message-v15[hidden]{display:none!important}
+
+/* VIP satın alma modalı mor tema. */
+.vip-modal-v28>section{border:1px solid #d8d9e4!important;box-shadow:0 18px 48px rgba(25,15,55,.25)!important}.vip-modal-v28 header{background:linear-gradient(100deg,#17102f,#4B1D9A)!important;color:#fff!important}.vip-buy-main-v28,.vip-coins-link-v28{background:linear-gradient(135deg,#6330C9,#4B1D9A)!important;color:#fff!important;border-color:#3c147d!important}
+
+
+/* ==========================================================
+   SOHBETIX V31 — PROFIL / PRESENCE / VIP / USER LIST FIX
+   ========================================================== */
+/* Sağ kullanıcı listesinde durum ve VIP rozetleri artık nick alanını daraltmaz. */
+.room-user-list-v15 li.user-target-v20{position:relative!important;min-width:0!important;overflow:hidden!important;align-items:flex-start!important;padding-right:3px!important}
+.room-user-list-v15 li.user-target-v20>.presence-status-v29{position:absolute!important;left:23px!important;top:24px!important;z-index:3!important;margin:0!important}
+.room-user-list-v15 li.user-target-v20>.vip-crown-v28{position:absolute!important;right:2px!important;top:2px!important;z-index:3!important;margin:0!important;font-size:7px!important;padding:1px 2px!important}
+.room-user-list-v15 li.user-target-v20>b{flex:1 1 auto!important;min-width:0!important;max-width:100%!important;white-space:normal!important;word-break:normal!important;overflow-wrap:anywhere!important;line-height:1.08!important;padding-top:3px!important;padding-right:0!important;display:-webkit-box!important;-webkit-box-orient:vertical!important;-webkit-line-clamp:3!important;overflow:hidden!important}
+.room-user-list-v15 .room-mini-avatar-v15.user-avatar-v28{flex:0 0 27px!important}
+@media(max-width:760px){
+  html.room-fixed-viewport .room-grid-v15,body.room-page-v15 .room-grid-v15,.room-grid-v15{grid-template-columns:minmax(0,1fr) clamp(96px,25vw,126px)!important}
+  .room-user-list-v15 li{gap:5px!important;padding:6px 3px!important}
+  .room-user-list-v15 b{font-size:11px!important}
+  .room-user-list-v15 li.user-target-v20>.presence-status-v29{left:22px!important;top:23px!important}
+}
+@media(min-width:761px){
+  html.room-fixed-viewport .room-grid-v15,body.room-page-v15 .room-grid-v15,.room-grid-v15{grid-template-columns:minmax(0,1fr) clamp(120px,12vw,170px)!important}
+}
+
+/* Gizli sohbette katılma / ayrılma sistem satırları. */
+.private-presence-v31{padding:5px 10px!important;border-radius:4px!important;background:rgba(75,29,154,.045)!important}
+.private-presence-v31.leave{opacity:.78!important}
+
+/* VIP kalan süre kartı. */
+.vip-live-status-v31{display:grid;gap:5px;margin:12px 0 18px;padding:12px 14px;border:1px solid #d9d4e8;border-radius:9px;background:linear-gradient(135deg,#faf8ff,#f2ecff);color:#31224f}
+.vip-live-status-v31 strong{font-size:15px;color:#4B1D9A}.vip-live-status-v31 span{font-size:12px;color:#62606b}
+
+/* V31 nick sınırı 20 karakter; profil seçim kutusunda sayaç görünümü. */
+.profile-counter-v25{font-variant-numeric:tabular-nums}
+
+.profile-locked-v31{opacity:.58}.profile-vip-lock-v31{margin-left:auto;background:#d6a000;color:#fff;border-radius:3px;padding:2px 4px;font-size:8px;font-weight:900}.profile-locked-v31 .profile-more-v25{opacity:.75}
+
+
+/* ============================================================
+   SOHBETIX V32 STATIC FIX
+   ============================================================ */
+.room-title-static-v32{cursor:default!important;user-select:none!important;pointer-events:none!important;display:flex!important;align-items:center!important}
+.private-link-v32{color:#5b21b6!important;text-decoration:underline!important;font-weight:800!important;overflow-wrap:anywhere!important;word-break:break-word!important}
+.private-notification-v32{position:fixed;right:14px;top:78px;z-index:20000;width:min(330px,calc(100vw - 28px));border:1px solid rgba(124,58,237,.35);background:#fff;color:#20232b;border-radius:13px;padding:12px 14px;box-shadow:0 16px 46px rgba(23,16,47,.28);display:grid;grid-template-columns:1fr;gap:3px;text-align:left;cursor:pointer}
+.private-notification-v32 strong{font-size:14px;color:#4B1D9A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.private-notification-v32 span{font-size:13px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.private-notification-v32 small{font-size:10px;color:#7a7f8a;font-weight:700}
+@media(max-width:600px){.private-notification-v32{top:70px;right:8px;width:calc(100vw - 16px)}}
+
+
+/* ============================================================
+   SOHBETIX V34 — GIF AVATAR / SES / E-POSTA / CHAT PLATFORMU
+   ============================================================ */
+/* Hareketli GIF avatarları sohbet satırını büyütmez; fotoğrafla aynı kutuya kırpılır. */
+.user-avatar-v28,.live-message-v15>.user-avatar-v28,.room-user-list-v15 .user-avatar-v28,.sohbetix-user-menu-head-v20 .user-avatar-v28{overflow:hidden!important;position:relative!important;box-sizing:border-box!important}
+.live-message-v15>.user-avatar-v28{width:38px!important;height:38px!important;min-width:38px!important;max-width:38px!important;flex:0 0 38px!important;border-radius:9px!important;align-self:start!important}
+.live-message-v15>.user-avatar-v28>img,.room-user-list-v15 .user-avatar-v28>img,.sohbetix-user-menu-head-v20 .user-avatar-v28>img{width:100%!important;height:100%!important;min-width:100%!important;max-width:100%!important;object-fit:cover!important;display:block!important;position:absolute!important;inset:0!important;margin:0!important;border-radius:inherit!important}
+.live-message-v15>.user-avatar-v28>i,.room-user-list-v15 .user-avatar-v28>i{position:absolute!important;z-index:3!important}
+@media(max-width:520px){.live-message-v15>.user-avatar-v28{width:34px!important;height:34px!important;min-width:34px!important;max-width:34px!important;flex-basis:34px!important}}
+
+.room-send-tools-v34{display:flex;align-items:center;gap:7px;margin-left:auto}
+.room-voice-v34{width:40px;height:40px;border:1px solid #d7ccef;border-radius:10px;background:#fff;color:#4B1D9A;display:grid;place-items:center;cursor:pointer;box-shadow:0 2px 7px rgba(75,29,154,.08)}
+.room-voice-v34 svg{width:21px;height:21px;fill:none;stroke:currentColor;stroke-width:2;stroke-linecap:round;stroke-linejoin:round}
+.room-voice-v34.recording{background:#d72f45;color:#fff;border-color:#b91e32;animation:voicePulseV34 1s infinite}
+@keyframes voicePulseV34{50%{box-shadow:0 0 0 7px rgba(215,47,69,.13)}}
+.voice-record-time-v34{font:800 11px/1 Arial;color:#d72f45;font-variant-numeric:tabular-nums;min-width:35px;text-align:right}
+.voice-bubble-v34{margin-top:5px;display:flex;align-items:center;gap:8px;max-width:310px;border:1px solid #ded6ee;background:linear-gradient(135deg,#fbf9ff,#f1ebff);border-radius:13px;padding:6px 8px}
+.voice-audio-v34{width:min(240px,52vw);height:34px}.voice-bubble-v34>span{font-size:10px;color:#6d6678;font-weight:800;white-space:nowrap}.voice-play-fallback-v34{width:30px;height:30px;border:0;border-radius:50%;background:#4B1D9A;color:#fff}
+@media(max-width:520px){.room-send-tools-v34{gap:5px}.room-voice-v34{width:38px;height:38px}.voice-record-time-v34{position:absolute;right:114px;bottom:52px;background:#fff;padding:4px 6px;border-radius:8px;box-shadow:0 2px 8px #0002}.voice-audio-v34{width:min(190px,44vw)}}
+
+.email-verify-v34{display:grid;gap:8px;padding:11px;border:1px solid #ded8eb;background:#faf8ff;border-radius:11px}.email-code-send-v34,.email-code-row-v34 button{border:0;background:linear-gradient(135deg,#6330C9,#4B1D9A);color:#fff;border-radius:8px;padding:10px 12px;font-weight:800;cursor:pointer}.email-code-row-v34{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:8px}.email-code-row-v34[hidden]{display:none!important}.email-code-row-v34 input{margin:0!important}.email-verify-status-v34{font-size:11px;color:#676170;font-weight:700;line-height:1.35}.email-verify-status-v34.ok{color:#168046}.email-verify-status-v34.error{color:#b51e2c}.email-verify-status-v34.pending{color:#5b21b6}.email-verify-v34.compact{margin:8px 0 12px}
+
+.v34-chat-select{display:flex!important;align-items:center!important;gap:12px!important}.v34-chat-select>strong{font-size:18px!important}.chat-platform-cta-v34{margin-left:auto;display:inline-flex;align-items:center;justify-content:center;text-decoration:none;color:#5b218f;font-weight:800;border:1px solid #d9ccef;background:#fff;border-radius:11px;padding:12px 15px;transition:.18s}.chat-platform-cta-v34:hover{background:#f5f0ff;color:#4B1D9A}.v34-chat-select>button{display:none!important}
+@media(max-width:640px){.v34-chat-select{align-items:stretch!important}.v34-chat-select>strong{display:flex;align-items:center}.chat-platform-cta-v34{font-size:12px;padding:10px;margin-left:auto;text-align:center}}
+
+.chat-platform-page-v34{margin:0;background:#f6f6f8;color:#283343;font-family:Arial,Helvetica,sans-serif;min-height:100vh}.chat-platform-top-v34{height:86px;padding:0 max(20px,calc((100vw - 980px)/2));display:flex;align-items:center;justify-content:space-between;border-bottom:3px solid #7b27e8;background:linear-gradient(128deg,transparent 0 67%,rgba(121,35,213,.11) 67.3% 69.2%,transparent 69.5% 73.2%,rgba(121,35,213,.17) 73.5% 76%,transparent 76.3% 81%,rgba(121,35,213,.20) 81.3% 84%,transparent 84.3% 100%),repeating-linear-gradient(135deg,rgba(255,255,255,0) 0 30px,rgba(107,34,191,.09) 31px 37px,rgba(255,255,255,0) 38px 58px),linear-gradient(100deg,#17102f 0%,#15112e 46%,#20103b 74%,#3d176f 100%)}.chat-platform-logo-v34 img{width:92px;height:62px;object-fit:contain;background:#fff;border-radius:10px;padding:4px}.chat-platform-menu-v34{width:48px;height:48px;border:1px solid rgba(255,255,255,.35);background:rgba(255,255,255,.08);border-radius:9px;display:grid;place-content:center;gap:5px}.chat-platform-menu-v34 span{display:block;width:25px;height:3px;border-radius:2px;background:#fff}.chat-platform-shell-v34{width:min(920px,calc(100% - 30px));margin:34px auto 70px;display:grid;gap:26px}.chat-platform-note-v34{font-size:19px;line-height:1.45;background:#f5f7fb;border-left:8px solid #4fa6cf;padding:22px 24px;border-radius:3px}.chat-platform-buy-v34{background:#eee;border-radius:14px;padding:52px 62px}.chat-platform-buy-v34 h1{font-size:42px;line-height:1.12;margin:0 0 24px;color:#252525}.chat-platform-buy-v34 h2{font-size:29px;font-weight:400;margin:0 0 24px}.plan-radio-v34{display:flex;align-items:flex-start;gap:12px;font-size:25px;font-weight:800;line-height:1.25;margin:22px 0}.plan-radio-v34 input{width:25px;height:25px;accent-color:#188ce5;flex:0 0 auto}.plan-radio-v34 b{font-weight:800}.plan-radio-v34 i{font-style:normal;background:#3f98d2;color:#fff;border-radius:6px;padding:6px 10px;font-size:18px}.buy-chat-plan-v34{margin-top:28px;border:0;background:#54b958;color:#fff;border-radius:10px;padding:18px 32px;font-size:28px;cursor:pointer;box-shadow:inset 0 -2px 0 rgba(0,0,0,.12)}.why-pro-v34{padding:4px 0 20px}.why-pro-v34 h2{font-size:40px;margin:0 0 20px}.why-pro-v34>p{font-size:21px}.why-pro-v34 ul{list-style:none;padding:0;margin:26px 0}.why-pro-v34 li{display:grid;grid-template-columns:56px 1fr;align-items:center;gap:16px;padding:23px 0;border-bottom:1px solid #e1e3e7;font-size:19px}.why-pro-v34 li span{font-size:38px;text-align:center}
+@media(max-width:620px){.chat-platform-top-v34{height:74px;padding:0 18px}.chat-platform-logo-v34 img{width:85px;height:54px}.chat-platform-shell-v34{width:calc(100% - 28px);margin:22px auto 50px;gap:20px}.chat-platform-note-v34{font-size:16px;padding:18px}.chat-platform-buy-v34{padding:32px 26px;border-radius:12px}.chat-platform-buy-v34 h1{font-size:31px}.chat-platform-buy-v34 h2{font-size:25px}.plan-radio-v34{font-size:20px}.plan-radio-v34 input{width:22px;height:22px}.plan-radio-v34 i{font-size:14px}.buy-chat-plan-v34{font-size:24px;padding:15px 26px}.why-pro-v34 h2{font-size:34px}.why-pro-v34>p{font-size:18px}.why-pro-v34 li{grid-template-columns:46px 1fr;font-size:17px;gap:10px;padding:18px 0}.why-pro-v34 li span{font-size:31px}}
+/* V34 avatar kolonu GIF/fotoğraf ölçüsüyle tam hizalı. */
+.live-message-v15{grid-template-columns:38px minmax(0,1fr)!important;align-items:start!important}
+@media(max-width:520px){.live-message-v15{grid-template-columns:34px minmax(0,1fr)!important}}
+
+/* ===== Sohbetix V34: platform menu / membership / account ===== */
+.chat-platform-menu-v34{cursor:pointer;position:relative;z-index:320}.platform-drawer-v34{position:fixed;top:86px;right:max(20px,calc((100vw - 980px)/2));z-index:310;width:min(360px,calc(100vw - 28px));background:#fff;border:1px solid #ded7ea;border-radius:0 0 14px 14px;box-shadow:0 18px 45px rgba(23,16,47,.24);padding:12px}.platform-drawer-primary-v34{width:100%;border:0;background:#f0edf5;color:#30323a;text-align:left;padding:15px 16px;border-radius:9px;font-size:17px;font-weight:850;cursor:pointer}.platform-drawer-primary-v34:hover{background:#e8e1f4}.platform-drawer-label-v34{padding:18px 10px 8px;color:#77717f;font-size:12px;font-weight:800;letter-spacing:.08em}.platform-account-row-v34{width:100%;display:grid;grid-template-columns:auto minmax(0,1fr) auto;align-items:center;gap:9px;border:0;background:#fff;text-align:left;padding:13px 10px;font-size:16px;font-weight:750;color:#3d3d45;cursor:pointer;border-top:1px solid #ece9f1}.platform-account-row-v34 #platformIdentityV34{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.platform-account-icon-v34{width:32px;height:32px;display:grid;place-items:center;background:#f5f2fa;border-radius:8px}.platform-account-menu-v34{display:grid;gap:5px;padding:7px;background:#f7f6f9;border-radius:9px}.platform-account-menu-v34 a,.platform-account-menu-v34 button{border:0;background:#fff;color:#333;text-align:left;padding:12px 13px;border-radius:8px;font-weight:700;cursor:pointer}.platform-account-menu-v34 a:hover,.platform-account-menu-v34 button:hover{background:#eee9f7}.chat-plan-status-v34{margin-top:15px;min-height:22px;color:#5b218f;font-weight:750;font-size:14px}.platform-faq-v34{padding:10px 0 30px;color:#31343a}.platform-faq-v34 h2{font-size:40px;line-height:1.1;margin:8px 0 28px;font-weight:500}.platform-faq-v34 h3{font-size:22px;margin:22px 0 8px}.platform-faq-v34 p{font-size:18px;line-height:1.55;margin:0 0 14px;color:#40434a}.chat-platform-footer-v34{border-top:1px solid #dddce3;background:#efeff1;color:#444;padding:18px max(20px,calc((100vw - 980px)/2));font-size:14px}.plan-modal-backdrop-v34{position:fixed;inset:0;z-index:500;background:rgba(10,7,20,.62);display:grid;place-items:center;padding:18px}.plan-modal-v34{position:relative;width:min(470px,100%);background:#fff;border-radius:16px;box-shadow:0 26px 70px rgba(0,0,0,.34);padding:26px}.plan-modal-v34 h2{margin:0 35px 8px 0;font-size:25px}.plan-modal-v34>p{color:#666;margin:0 0 20px}.plan-modal-v34 label{display:flex;align-items:center;gap:10px;border:1px solid #ded9e8;border-radius:10px;padding:14px 13px;margin:10px 0;font-size:16px;cursor:pointer}.plan-modal-v34 label input{width:20px;height:20px;accent-color:#5b21b6}.plan-modal-close-v34{position:absolute;right:14px;top:12px;border:0;background:transparent;font-size:30px;color:#777;cursor:pointer}.plan-balance-v34{margin:16px 0 12px;background:#f6f3fb;border-radius:9px;padding:12px}.plan-confirm-v34{border:0;background:linear-gradient(135deg,#5c25c8,#7b2de2);color:#fff;border-radius:10px;padding:13px 18px;font-weight:850;font-size:16px;cursor:pointer;width:100%}
+
+/* dashboard identity menu */
+.dash-account-wrap-v34{position:relative;margin-left:auto;min-width:0}.dash-account-v34{max-width:360px;border:1px solid rgba(255,255,255,.22);background:rgba(255,255,255,.09);color:#fff;border-radius:10px;padding:10px 12px;font-weight:800;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.dash-account-v34 span{vertical-align:middle}.dash-account-menu-v34{position:absolute;right:0;top:48px;width:190px;background:#fff;border:1px solid #ded7ea;border-radius:10px;padding:6px;box-shadow:0 15px 35px rgba(17,11,38,.22);z-index:220}.dash-account-menu-v34 a,.dash-account-menu-v34 button{display:block;width:100%;border:0;background:#fff;color:#333;text-align:left;padding:11px 12px;border-radius:7px;font-weight:700;cursor:pointer}.dash-account-menu-v34 a:hover,.dash-account-menu-v34 button:hover{background:#f3eff9}
+
+/* account page */
+.chat-platform-top-v34.compact-v34{height:82px}.account-back-v34{color:#fff;border:1px solid rgba(255,255,255,.4);border-radius:9px;padding:10px 14px;font-weight:800}.account-v34-shell{width:min(760px,calc(100% - 28px));margin:34px auto 70px}.account-v34-card{background:#fff;border:1px solid #dddfe6;border-radius:16px;padding:28px;box-shadow:0 10px 34px rgba(17,24,39,.08)}.account-v34-card h1{margin:0 0 28px;font-size:30px}.account-row-v34{display:grid;gap:10px;margin:0 0 25px;font-size:16px}.account-row-v34 strong{font-size:17px}.account-row-v34 code{display:inline-flex;width:max-content;background:#fff1f4;color:#ba3150;border-radius:6px;padding:6px 9px;font-size:16px}.account-row-v34 select{width:100%;padding:13px}.verified-dot-v34{display:inline-grid;place-items:center;width:22px;height:22px;border-radius:50%;background:#333;color:#fff;font-size:12px}.account-actions-v34{display:flex;gap:10px;flex-wrap:wrap;margin:5px 0 24px}.account-save-v34,.account-secondary-v34,.account-logout-v34{border:0;border-radius:8px;padding:12px 17px;font-size:16px;cursor:pointer}.account-save-v34{background:#3e94cd;color:#fff}.account-secondary-v34{background:#fff;color:#3b3b3b;border:1px solid #ccd2d8}.account-logout-v34{margin-top:16px;background:#b2222c;color:#fff}.account-info-v34{padding:20px;border-radius:8px;margin:18px 0;font-size:15px;line-height:1.55}.account-info-v34.blue{background:#dff3fb;color:#326f8c;border:1px solid #c7e7f2}.account-info-v34.pay{background:#fff8df;color:#755d20;border:1px solid #f1e3a9}.account-footer-v34{border-top:1px solid #ddd;background:#eee;padding:18px;text-align:center;color:#444}
+
+@media(max-width:620px){.platform-drawer-v34{top:74px;right:14px}.platform-faq-v34 h2{font-size:31px}.platform-faq-v34 h3{font-size:20px}.platform-faq-v34 p{font-size:16px}.dash-account-v34{max-width:195px;padding:9px 10px;font-size:12px}.dash-account-menu-v34{width:170px}.dash-nav .dash-tab{display:none!important}.account-v34-shell{margin-top:22px}.account-v34-card{padding:20px}.chat-platform-top-v34.compact-v34{height:74px}}

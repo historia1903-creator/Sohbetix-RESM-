@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Sohbetix Kontrol Paneli</title>
+<link href="styles.css?v=V34-STATIC-FIX" rel="stylesheet"/>
+<meta content="#17102F" name="theme-color"/>
+<link rel="icon" type="image/jpeg" href="sohbetix-logo.jpg"/>
+</head>
+<body class="control-page">
+<header class="control-topbar">
+<div class="control-wrap control-nav">
+<a class="brand brand-logo-v21" href="index.html" aria-label="Sohbetix"><img src="sohbetix-logo.jpg" alt="Sohbetix"/></a>
+<a class="control-tab active" href="control.html">SOHBET KONTROL PANELİ</a>
+<button class="control-tab disabled" disabled="" type="button">JETONLAR</button>
+</div>
+</header>
+<main class="control-main">
+<section class="signin-card">
+<h1>Sohbet Kontrol Paneline giriş yap</h1>
+<div class="fast-login-box">
+<div class="fast-title">Hızlı giriş</div>
+<div class="oauth-row">
+<button class="oauth-btn" disabled="" title="Yakında aktif olacak" type="button">G</button>
+<button class="oauth-btn fb-icon" disabled="" title="Yakında aktif olacak" type="button">f</button>
+<button class="oauth-btn yx-icon" disabled="" title="Yakında aktif olacak" type="button">Я</button>
+</div>
+<small>Google, Facebook ve Yandex girişleri şimdilik pasif.</small>
+</div>
+<div class="auth-actions">
+<button class="auth-main-btn register" id="showRegister" type="button">Kayıt Ol</button>
+<button class="auth-main-btn login" id="showLogin" type="button">Giriş Yap</button>
+</div>
+<div class="auth-panel" hidden="" id="registerPanel">
+<h2>Kayıt Ol</h2>
+<label>E-posta</label>
+<input id="controlRegEmail" placeholder="E-posta adresini yaz" type="email" autocomplete="email"/>
+<div class="email-verify-v34 compact" id="controlEmailVerifyV34"><button id="controlSendCodeV34" class="email-code-send-v34" type="button">E-posta doğrulama kodu gönder</button><div class="email-code-row-v34" id="controlCodeRowV34" hidden><input id="controlCodeV34" inputmode="numeric" maxlength="6" placeholder="6 haneli kod"><button id="controlVerifyCodeV34" type="button">Doğrula</button></div><div class="email-verify-status-v34" id="controlVerifyStatusV34">Kayıt için e-posta doğrulaması zorunludur.</div></div>
+<label>Şifre</label>
+<input id="controlRegPass" placeholder="Şifreni yaz" type="password" autocomplete="new-password"/>
+<label>Şifre tekrar</label>
+<input id="controlRegPass2" placeholder="Şifreni tekrar yaz" type="password" autocomplete="new-password"/>
+<button class="submit-auth" id="registerSubmit" type="button">Hesap Oluştur</button>
+
+</div>
+<div class="auth-panel" hidden="" id="loginPanel">
+<h2>Giriş Yap</h2>
+<label>E-posta</label>
+<input id="controlLoginId" placeholder="E-posta adresini yaz" type="email" autocomplete="email"/>
+<label>Şifre</label>
+<input id="controlLoginPass" placeholder="Şifreni yaz" type="password" autocomplete="current-password"/>
+<button class="submit-auth" id="loginSubmit" type="button">Giriş Yap</button>
+
+</div>
+</section>
+</main>
+<footer class="control-footer">
+<div class="control-wrap footer-inner">
+<div>© 2026 Sohbetix</div>
+<select class="lang-switch"><option value="tr">Türkçe</option><option value="en">English</option></select>
+</div>
+</footer>
+<script>
+const regBtn=document.getElementById('showRegister');
+const logBtn=document.getElementById('showLogin');
+const reg=document.getElementById('registerPanel');
+const log=document.getElementById('loginPanel');
+
+regBtn.addEventListener('click',()=>{
+  reg.hidden=false;
+  log.hidden=true;
+  reg.scrollIntoView({behavior:'smooth',block:'center'});
+});
+logBtn.addEventListener('click',()=>{
+  log.hidden=false;
+  reg.hidden=true;
+  log.scrollIntoView({behavior:'smooth',block:'center'});
+});
+
+/* V21 FULL FIX: Kontrol paneli hesabı, sohbet içindeki @ hesabından tamamen ayrıdır. */
+const CONTROL_USERS_KEY='sohbetix-control-users-v21';
+const CONTROL_SESSION_KEY='sohbetix-control-session-v21';
+const normalizeControl=v=>String(v||'').trim().toLocaleLowerCase('tr-TR');
+let controlVerifiedEmail='';let controlLocalCode='';let controlLocalExpiry=0;
+const readControlUsers=()=>{try{return JSON.parse(localStorage.getItem(CONTROL_USERS_KEY)||'[]')}catch{return[]}};
+const writeControlUsers=list=>localStorage.setItem(CONTROL_USERS_KEY,JSON.stringify(list));
+async function controlHash(value){
+  const data=new TextEncoder().encode(String(value||''));
+  const buf=await crypto.subtle.digest('SHA-256',data);
+  return [...new Uint8Array(buf)].map(x=>x.toString(16).padStart(2,'0')).join('');
+}
+function saveControlSession(user){
+  localStorage.setItem(CONTROL_SESSION_KEY,JSON.stringify({id:user.id,email:user.email,at:Date.now()}));
+}
+
+function controlResetVerify(){controlVerifiedEmail='';controlLocalCode='';controlLocalExpiry=0;document.getElementById('controlCodeRowV34').hidden=true;const st=document.getElementById('controlVerifyStatusV34');st.className='email-verify-status-v34';st.textContent='Kayıt için e-posta doğrulaması zorunludur.';}
+document.getElementById('controlRegEmail').addEventListener('input',()=>{if(normalizeControl(document.getElementById('controlRegEmail').value)!==controlVerifiedEmail)controlResetVerify();});
+document.getElementById('controlSendCodeV34').addEventListener('click',async()=>{const email=normalizeControl(document.getElementById('controlRegEmail').value),st=document.getElementById('controlVerifyStatusV34');if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){st.textContent='Önce geçerli bir e-posta adresi yaz.';return;}document.getElementById('controlCodeRowV34').hidden=false;try{const r=await fetch('/api/auth/send-verification',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email})});if(!r.ok)throw new Error();st.className='email-verify-status-v34 pending';st.textContent='Doğrulama kodu e-posta adresine gönderildi.';controlLocalCode='';}catch{controlLocalCode=String(Math.floor(100000+Math.random()*900000));controlLocalExpiry=Date.now()+600000;st.className='email-verify-status-v34 pending';st.textContent='E-posta sunucusu bağlı olmadığı için önizleme kodu: '+controlLocalCode;}});
+document.getElementById('controlVerifyCodeV34').addEventListener('click',async()=>{const email=normalizeControl(document.getElementById('controlRegEmail').value),code=String(document.getElementById('controlCodeV34').value||'').trim(),st=document.getElementById('controlVerifyStatusV34');let ok=false;if(controlLocalCode){ok=Date.now()<controlLocalExpiry&&code===controlLocalCode;}else{try{const r=await fetch('/api/auth/verify-email',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,code})});const d=await r.json();ok=r.ok&&!!d.ok;}catch{}}if(!ok){st.className='email-verify-status-v34 error';st.textContent='Doğrulama kodu hatalı veya süresi dolmuş.';return;}controlVerifiedEmail=email;st.className='email-verify-status-v34 ok';st.textContent='✓ E-posta doğrulandı.';});
+
+document.getElementById('registerSubmit').addEventListener('click',async()=>{
+  const email=normalizeControl(document.getElementById('controlRegEmail').value);
+  const pass=document.getElementById('controlRegPass').value;
+  const pass2=document.getElementById('controlRegPass2').value;
+  if(!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)){alert('Geçerli bir e-posta adresi yaz.');return;}
+  if(controlVerifiedEmail!==email){alert('Kayıt olmadan önce e-posta adresini doğrula.');return;}
+  if(pass.length<8){alert('Şifre en az 8 karakter olmalı.');return;}
+  if(pass!==pass2){alert('Şifreler aynı değil.');return;}
+  const users=readControlUsers();
+  if(users.some(u=>normalizeControl(u.email)===email)){alert('Bu e-posta zaten kayıtlı.');return;}
+  const user={id:(crypto.randomUUID?crypto.randomUUID():'cp-'+Date.now()),email,emailVerified:true,emailVerifiedAt:Date.now(),passwordHash:await controlHash(pass),createdAt:Date.now(),coins:5000};
+  users.push(user); writeControlUsers(users); saveControlSession(user);
+  location.href='chat-platform.html';
+});
+
+document.getElementById('loginSubmit').addEventListener('click',async()=>{
+  const login=normalizeControl(document.getElementById('controlLoginId').value);
+  const pass=document.getElementById('controlLoginPass').value;
+  if(!login||!pass){alert('E-posta ve şifreni gir.');return;}
+  const users=readControlUsers();
+  let user=users.find(u=>normalizeControl(u.email)===login);
+  if(!user||user.passwordHash!==await controlHash(pass)){alert('E-posta veya şifre hatalı.');return;}
+  if(!Number.isFinite(Number(user.coins))){user={...user,coins:5000};const i=users.findIndex(x=>String(x.id)===String(user.id));users[i]=user;writeControlUsers(users);}
+  saveControlSession(user);
+  location.href='chat-platform.html';
+});
+</script>
+<script src="app.js?v=V34-STATIC-FIX"></script><script src="v34-core.js?v=V34-STATIC-FIX"></script><script src="presence-bridge.js?v=V34-STATIC-FIX"></script></body>
+</html>

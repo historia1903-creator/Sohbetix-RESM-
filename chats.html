@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+
+<html lang="tr">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width,initial-scale=1" name="viewport"/>
+<title>Sohbet Odaları - Sohbetix</title>
+<link href="styles.css?v=V34-STATIC-FIX" rel="stylesheet"/>
+<meta content="#17102F" name="theme-color"/>
+<link rel="icon" type="image/jpeg" href="sohbetix-logo.jpg"/>
+</head>
+<body class="catalog-page">
+<header class="topbar">
+<div class="wrap nav">
+<a class="brand brand-logo-v21" href="index.html" aria-label="Sohbetix"><img src="sohbetix-logo.jpg" alt="Sohbetix"/></a>
+<nav>
+<a href="chats.html">SOHBET ODALARI</a>
+<a href="about.html">HAKKINDA</a>
+<div class="more-nav">
+<button class="more-btn more2" type="button">DAHA FAZLA ▾</button>
+<div class="more-menu menu2" hidden="">
+<a href="coins.html">JETONLAR</a>
+<a href="account.html">HESAP</a>
+<a href="help.html">YARDIM VE DESTEK</a>
+</div>
+</div>
+</nav>
+<a class="control" href="control.html">SOHBET KONTROL PANELİ</a>
+<button aria-label="Menü" class="mobile-menu-btn" type="button"><span></span><span></span><span></span></button>
+</div>
+</header>
+<div class="mobile-nav-panel" hidden="">
+<a href="chats.html">SOHBET ODALARI</a>
+<a href="about.html">HAKKINDA</a>
+<button class="mobile-more-toggle" type="button">DAHA FAZLA ▾</button>
+<div class="mobile-more-menu" hidden="">
+<a href="coins.html">JETONLAR</a>
+<a href="account.html">HESAP</a>
+<a href="help.html">YARDIM VE DESTEK</a>
+</div>
+<a class="mobile-control-link" href="control.html">SOHBET KONTROL PANELİ</a>
+</div>
+<main class="catalog-main">
+<div class="catalog-wrap">
+<div class="catalog-toolbar">
+<div class="catalog-left">
+<button class="catalog-filter-btn" id="categoryBtn" type="button">Tüm kategoriler ▾</button>
+<button class="english-only" id="englishOnly" type="button">Yalnızca Türkçe</button>
+<div class="catalog-category-menu" hidden="" id="categoryMenu">
+<button class="selected" data-cat="all">Tüm kategoriler</button>
+<button data-cat="Arkadaşlık">Arkadaşlık</button>
+<button data-cat="Haber">Haber</button>
+<button data-cat="Eğlence">Eğlence</button>
+<button data-cat="Radyo">Radyo</button>
+<button data-cat="Sağlık ve güzellik">Sağlık ve güzellik</button>
+<button data-cat="Otomobil">Otomobil</button>
+<button data-cat="Spor">Spor</button>
+<button data-cat="İş">İş</button>
+<button data-cat="İnternet">İnternet</button>
+<button data-cat="Ücretsiz">Ücretsiz</button>
+<button data-cat="Sanat">Sanat</button>
+<button data-cat="Paranormal">Paranormal</button>
+<button data-cat="Ev ve aile">Ev ve aile</button>
+<button data-cat="Ürün ve hizmetler">Ürün ve hizmetler</button>
+<button data-cat="Toplum">Toplum</button>
+<button data-cat="Evcil hayvanlar">Evcil hayvanlar</button>
+</div>
+</div>
+<form class="catalog-search" id="catalogSearch">
+<input autocomplete="off" id="chatTitleSearch" placeholder="Sohbet adı..." type="search"/>
+<button class="catalog-search-btn" type="submit">Ara</button>
+</form>
+</div>
+<div id="resultsArea">
+<div class="catalog-empty" id="emptyState">
+        Sohbet odaları burada listelenecek. Bir sohbet adı yazıp <b>Ara</b> düğmesine basabilir veya kategori seçebilirsin.
+      </div>
+</div>
+</div>
+</main>
+<footer class="catalog-foot">
+<div class="wrap footer-inner">
+<div>
+<div>© 2026 Sohbetix</div>
+<div class="stats">📶 Online 345 of 3.344 users in 620 chats</div>
+<div><a href="terms.html">Kullanım şartları</a> · <a href="privacy.html">Gizlilik politikası</a></div>
+</div>
+<select class="lang-switch"><option value="tr">Türkçe</option><option value="en">English</option></select>
+</div>
+</footer>
+<script>
+const CATALOG_KEY='sohbetix-v28-chat-catalog';
+if(!localStorage.getItem(CATALOG_KEY)&&localStorage.getItem('sohbetix-v27-chat-catalog'))localStorage.setItem(CATALOG_KEY,localStorage.getItem('sohbetix-v27-chat-catalog'));
+const CONFIG_KEY='sohbetix-v18-chat-config';
+const PRESENCE_PREFIX='sohbetix-v28-room-presence:';
+
+const safe=(raw,fallback)=>{try{return raw?JSON.parse(raw):fallback}catch{return fallback}};
+const cfgV18=safe(localStorage.getItem(CONFIG_KEY),{});
+const storedCatalog=safe(localStorage.getItem(CATALOG_KEY),[]);
+
+function uniqueOnlineNow(){
+  const presence=safe(localStorage.getItem(PRESENCE_PREFIX+String(cfgV18.slug||'sohbetix')),{});
+  const now=Date.now();
+  const seen=new Set();
+  for(const item of Object.values(presence)){
+    if(!item || now-Number(item.lastSeen||0)>210000) continue;
+    const nick=String(item.nick||'').trim().toLocaleLowerCase('tr-TR');
+    if(nick) seen.add(nick);
+  }
+  return seen.size;
+}
+
+const rooms=(Array.isArray(storedCatalog)?storedCatalog:[])
+  .filter(r=>r && r.title && r.slug)
+  .map(r=>({
+    name:String(r.title),
+    desc:String(r.description||''),
+    online:String(r.slug)===String(cfgV18.slug||'') ? uniqueOnlineNow() : 0,
+    lang:r.language==='en'?'English':'Türkçe',
+    cat:String(r.category||'Arkadaşlık'),
+    slug:String(r.slug),
+    updatedAt:Number(r.updatedAt||0)
+  }))
+  .sort((a,b)=>b.updatedAt-a.updatedAt);
+
+if(cfgV18.catalogVisible!==false && cfgV18.title && cfgV18.slug && !rooms.some(r=>r.slug===cfgV18.slug)){
+  rooms.unshift({
+    name:String(cfgV18.title),
+    desc:String(cfgV18.description||''),
+    online:uniqueOnlineNow(),
+    lang:cfgV18.language==='en'?'English':'Türkçe',
+    cat:String(cfgV18.category||'Arkadaşlık'),
+    slug:String(cfgV18.slug),
+    updatedAt:Date.now()
+  });
+}
+
+let selectedCategory="all";
+let onlyTurkish=false;
+
+const categoryBtn=document.getElementById("categoryBtn");
+const categoryMenu=document.getElementById("categoryMenu");
+const resultsArea=document.getElementById("resultsArea");
+const searchInput=document.getElementById("chatTitleSearch");
+
+categoryBtn.addEventListener("click",e=>{
+  e.stopPropagation();
+  categoryMenu.hidden=!categoryMenu.hidden;
+});
+categoryMenu.addEventListener("click",e=>e.stopPropagation());
+document.addEventListener("click",()=>categoryMenu.hidden=true);
+
+categoryMenu.querySelectorAll("button").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    selectedCategory=btn.dataset.cat;
+    categoryMenu.querySelectorAll("button").forEach(x=>x.classList.remove("selected"));
+    btn.classList.add("selected");
+    categoryBtn.textContent=(selectedCategory==="all"?"Tüm kategoriler":selectedCategory)+" ▾";
+    categoryMenu.hidden=true;
+    renderResults();
+  });
+});
+
+document.getElementById("englishOnly").addEventListener("click",function(){
+  onlyTurkish=!onlyTurkish;
+  this.classList.toggle("active",onlyTurkish);
+  this.textContent=onlyTurkish?"✓ Yalnızca Türkçe":"Yalnızca Türkçe";
+  renderResults();
+});
+
+document.getElementById("catalogSearch").addEventListener("submit",e=>{
+  e.preventDefault();
+  renderResults();
+});
+
+function renderResults(){
+  const q=searchInput.value.trim().toLocaleLowerCase("tr-TR");
+  const filtered=rooms.filter(r=>{
+    const nameOk=!q || r.name.toLocaleLowerCase("tr-TR").includes(q);
+    const catOk=selectedCategory==="all" || r.cat===selectedCategory;
+    const langOk=!onlyTurkish || r.lang==="Türkçe";
+    return nameOk && catOk && langOk;
+  });
+
+  if(!filtered.length){
+    resultsArea.innerHTML='<div class="catalog-empty">Henüz katalogda gösterilecek sohbet bulunmuyor.</div>';
+    return;
+  }
+
+  resultsArea.innerHTML=`
+    <div class="catalog-results-head">
+      <div>Sohbet adı</div><div>Çevrimiçi</div><div>Dil</div>
+    </div>
+    ${filtered.map(r=>`
+      <div class="catalog-row">
+        <div>
+          <a href="open-chat.html?room=${encodeURIComponent(r.slug)}">${escapeHtml(r.name)}</a>
+          <p>${escapeHtml(r.desc || 'Sohbetix sohbet odası')}</p>
+        </div>
+        <div class="catalog-count">${r.online}</div>
+        <div class="catalog-language">${r.lang}</div>
+      </div>`).join("")}`;
+}
+
+function escapeHtml(s){
+  return String(s).replace(/[&<>"']/g,c=>({"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#039;"}[c]));
+}
+
+// desktop More
+document.querySelectorAll(".more2").forEach(b=>{
+  const m=b.parentElement.querySelector(".menu2");
+  b.addEventListener("click",e=>{e.stopPropagation();m.hidden=!m.hidden});
+  m.addEventListener("click",e=>e.stopPropagation());
+});
+document.addEventListener("click",()=>document.querySelectorAll(".menu2").forEach(m=>m.hidden=true));
+
+// mobile menu
+const mobileBtn=document.querySelector(".mobile-menu-btn");
+const mobilePanel=document.querySelector(".mobile-nav-panel");
+const mobileMore=document.querySelector(".mobile-more-toggle");
+const mobileMoreMenu=document.querySelector(".mobile-more-menu");
+if(mobileBtn&&mobilePanel) mobileBtn.addEventListener("click",e=>{
+  e.stopPropagation();
+  mobilePanel.hidden=!mobilePanel.hidden;
+  if(mobilePanel.hidden&&mobileMoreMenu)mobileMoreMenu.hidden=true;
+});
+if(mobileMore&&mobileMoreMenu) mobileMore.addEventListener("click",e=>{
+  e.stopPropagation();
+  mobileMoreMenu.hidden=!mobileMoreMenu.hidden;
+});
+
+renderResults();
+</script>
+<script src="app.js?v=V34-STATIC-FIX"></script><script src="v34-core.js?v=V34-STATIC-FIX"></script><script src="presence-bridge.js?v=V34-STATIC-FIX"></script></body>
+</html>
